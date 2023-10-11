@@ -19,3 +19,6 @@ venv/
 
 # Ignore log files
 *.log
+
+# Ignorar el archivo de configuración local
+settings_local.py
