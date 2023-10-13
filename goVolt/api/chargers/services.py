@@ -16,6 +16,14 @@ def get_chargers_by_codi_prov(codi_prov):
         result.append(data)
     return result
 
+def get_all_chargers():
+    collection_ref = FIREBASE_DB.collection('charge_points')
+    all_chargers = collection_ref.get()
+    results = []
+    for charger in all_chargers:
+        charger_coords = charger.get('geocoded_column')
+        results.append([{"id": charger.id,"coordinates" : charger_coords["coordinates"]}])
+    return results
 
 def store_charge_points_fb(data):
     
