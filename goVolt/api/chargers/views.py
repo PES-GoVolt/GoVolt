@@ -11,4 +11,5 @@ class ChargerLocationApiView(APIView):
         response_data = get_all_chargers()
         return Response(response_data,status=status.HTTP_200_OK)
 
+
     

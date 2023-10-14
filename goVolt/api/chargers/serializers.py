@@ -1,8 +1,8 @@
 
 from rest_framework import serializers
-from models import ChargerLocation
+from .models import ChargerLocation
 
 class ChargerLocationSerializer(serializers.ModelSerializer):
-    class Meta:
+     class Meta:
         model = ChargerLocation
-        fields = [latitude,longitude]
+        fields = ['charger_id', 'latitude','longitude']

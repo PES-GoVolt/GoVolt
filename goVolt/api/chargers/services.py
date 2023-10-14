@@ -3,6 +3,26 @@ from firebase_admin import firestore
 import pandas as pd
 from sodapy import Socrata
 from goVolt.settings import FIREBASE_DB
+from .serializers import ChargerLocationSerializer
+from rest_framework import serializers
+
+def get_all_chargers():
+    collection_ref = FIREBASE_DB.collection('charge_points')
+    all_chargers = collection_ref.get()
+    chargers_data = []
+    for doc in all_chargers:
+        data = doc.to_dict()
+        data['charger_id'] = doc.id
+        coordinates = data.get('geocoded_column',{}).get('coordinates',{})
+        data['latitude'] = coordinates[0]
+        data['longitude'] = coordinates[1]
+        chargers_data.append(data)
+
+    serializer = ChargerLocationSerializer(data=chargers_data, many=True)
+    if serializer.is_valid():
+        return serializer.data
+    else:
+        raise serializers.ValidationError(serializer.errors)
 
 def get_chargers_by_codi_prov(codi_prov):
     collection_ref = FIREBASE_DB.collection('charge_points')
@@ -15,15 +35,6 @@ def get_chargers_by_codi_prov(codi_prov):
         data = doc.to_dict()
         result.append(data)
     return result
-
-def get_all_chargers():
-    collection_ref = FIREBASE_DB.collection('charge_points')
-    all_chargers = collection_ref.get()
-    results = []
-    for charger in all_chargers:
-        charger_coords = charger.get('geocoded_column')
-        results.append([{"id": charger.id,"coordinates" : charger_coords["coordinates"]}])
-    return results
 
 def store_charge_points_fb(data):
     
