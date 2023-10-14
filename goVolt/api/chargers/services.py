@@ -42,7 +42,13 @@ def store_charge_points_fb(data):
     collection_name = 'charge_points'
     for record in data:
         FIREBASE_DB.collection(collection_name).add(record)
-       
+
+def delete_all_charge_points_fb():
+    collection_ref = FIREBASE_DB.collection('charge_points')
+    docs = collection_ref.get()
+
+    for doc in docs:
+        doc.reference.delete()
 def read_data():
     client = Socrata("analisi.transparenciacatalunya.cat", None)
     results = client.get("tb2m-m33b")
