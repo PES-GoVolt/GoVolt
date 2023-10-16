@@ -22,3 +22,5 @@ venv/
 
 # Ignorar el archivo de configuración local
 settings_local.py
+
+database/

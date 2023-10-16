@@ -37,10 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api.chargers',
-    'api.users',
     'rest_framework'
 ]
+import os
+app_names = [app for app in os.listdir('api') if os.path.isdir(os.path.join('api', app))]
+INSTALLED_APPS += [f'api.{app}' for app in app_names]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,8 +79,8 @@ WSGI_APPLICATION = 'goVolt.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.dummy',
-        'NAME': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
