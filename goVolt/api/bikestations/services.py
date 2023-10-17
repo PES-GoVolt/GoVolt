@@ -50,4 +50,4 @@ def get_all_bikestations():
     if serializer.is_valid():
         return serializer.data
     else:
-        raise serializers.ValidationError(serializer.errors)
+        raise serializer.ValidationError(serializer.errors)
