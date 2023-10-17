@@ -15,6 +15,5 @@ class ChargerLocationApiView(APIView):
 class ChargerDataBaseApiView(APIView):
     def post(self,request):
         chargers = read_data()
-        delete_all_charge_points_fb()
         store_charge_points_fb(chargers)
         return Response({'message':'The chargers database was updated'},status=status.HTTP_200_OK)

@@ -40,8 +40,19 @@ def get_chargers_by_codi_prov(codi_prov):
 
 def store_charge_points_fb(data):
     collection_name = 'charge_points'
+    collection_ref = FIREBASE_DB.collection(collection_name)
+
     for record in data:
-        FIREBASE_DB.collection(collection_name).add(record)
+        charger_id = record['id']
+        existing_charger = collection_ref.document(str(charger_id)).get()
+
+        if existing_charger.exists:
+            existing_charger_data = existing_charger.to_dict()
+
+            if existing_charger_data != record:
+                existing_charger.reference.update(record)
+        else:
+            collection_ref.document(str(charger_id)).set(record)
 
 def delete_all_charge_points_fb():
     collection_ref = FIREBASE_DB.collection('charge_points')
@@ -49,6 +60,7 @@ def delete_all_charge_points_fb():
 
     for doc in docs:
         doc.reference.delete()
+
 def read_data():
     client = Socrata("analisi.transparenciacatalunya.cat", None)
     results = client.get("tb2m-m33b")
