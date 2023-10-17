@@ -15,9 +15,19 @@ def read_data_stations():
 
 def store_data_stations(data):
     collection_name = 'bike_stations'
+    collection_ref = FIREBASE_DB.collection(collection_name)
 
     for record in data:
-        FIREBASE_DB.collection(collection_name).add(record)
+        station_id = record['station_id']
+        existing_station = collection_ref.document(str(station_id)).get()
+
+        if existing_station.exists:
+            existing_station_data = existing_station.to_dict()
+
+            if existing_station_data != record:
+                existing_station.reference.update(record)
+        else:
+            collection_ref.document(str(station_id)).set(record)
 
 def delete_all_bikestations_fb():
     collection_ref = FIREBASE_DB.collection('bike_stations')
@@ -28,8 +38,6 @@ def delete_all_bikestations_fb():
 def get_all_bikestations():
     collection_ref = FIREBASE_DB.collection('bike_stations')
     docs = collection_ref.get()
-
-
     chargers_data = []
     for doc in docs:
         data = doc.to_dict()
