@@ -65,6 +65,7 @@ def read_data():
     client = Socrata("analisi.transparenciacatalunya.cat", None)
     results = client.get("tb2m-m33b")
     results_df = pd.DataFrame.from_records(results)
+    results_df = results_df[(results_df['acces'] != '') & (results_df['acces'] != 'APARCAMENT SEU (PRIVAT)')]
     results_df = results_df.to_dict(orient='records')
     return results_df 
 
