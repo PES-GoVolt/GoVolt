@@ -16,4 +16,4 @@ class ChargerDataBaseApiView(APIView):
     def post(self,request):
         chargers = read_data()
         store_charge_points_fb(chargers)
-        return Response({'message':'The chargers database was updated'},status=status.HTTP_200_OK)
+        return Response({'message':'The chargers database was updated'},status=status.HTTP_201_CREATED)
