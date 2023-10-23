@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from firebase_admin import firestore
-from django.http import JsonResponse
+
 import pandas as pd
 from sodapy import Socrata
 
