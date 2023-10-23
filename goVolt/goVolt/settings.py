@@ -38,11 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    'rest_framework',
+    'api.chargers',
+    'api.bikestations',
+    'api.users'
 ]
-import os
-app_names = [app for app in os.listdir('api') if os.path.isdir(os.path.join('api', app))]
-INSTALLED_APPS += [f'api.{app}' for app in app_names]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
