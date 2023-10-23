@@ -25,8 +25,9 @@ SECRET_KEY = 'django-insecure-rgmwddxt^-xs3qzoia-6r!ollfrb6pv++bg(u=7o=24p7i&1_u
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+APPEND_SLASH = False
 
 # Application definition
 
@@ -37,11 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    'rest_framework',
+    'api.chargers',
+    'api.bikestations',
+    'api.users'
 ]
-import os
-app_names = [app for app in os.listdir('api') if os.path.isdir(os.path.join('api', app))]
-INSTALLED_APPS += [f'api.{app}' for app in app_names]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -84,12 +85,30 @@ DATABASES = {
     }
 }
 
-
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-cred = credentials.Certificate("database\govolt-6ab4c-firebase-adminsdk-dcroz-d893031c11.json")
-firebase_admin.initialize_app(cred)
+import pyrebase
+
+cred = credentials.Certificate("database/govolt-ea98b-firebase-adminsdk-zh4es-0b858f1221.json")
+
+firebaseConfig = {
+  "apiKey": "AIzaSyDQyP4_8RMlTgkOzV9rLIuGNB7sIcI3HLQ",
+  "authDomain": "govolt-ea98b.firebaseapp.com",
+  "databaseURL": "https://govolt-ea98b-default-rtdb.europe-west1.firebasedatabase.app",
+  "projectId": "govolt-ea98b",
+  "storageBucket": "govolt-ea98b.appspot.com",
+  "messagingSenderId": "651822731614",
+  "appId": "1:651822731614:web:e3441bc1bd9ea2bda1ffcf",
+  "measurementId": "G-8P87F12XX2"
+}
+
+# autentificacion
+firebase_auth = pyrebase.initialize_app(firebaseConfig)
+AUTH_DB = firebase_auth.auth()
+
+# resto de tablas
+firebase = firebase_admin.initialize_app(cred)
 
 def get_firestore_db():
     return firestore.client()
