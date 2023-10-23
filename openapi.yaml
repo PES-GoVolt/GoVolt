@@ -1,0 +1,140 @@
+openapi: 3.0.0
+info:
+  title: Charging Points API
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8000/api
+paths:
+  /chargers/all/:
+    get:
+      tags:
+      - Charge Stations
+      summary: Get all charging points
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChargerLocation'
+  /chargers/nearest/:
+    post:
+      tags:
+      - Charge Stations
+      summary: Get nearest charger
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                longitud:
+                  type: number
+                  format: float
+                latitud:
+                  type: number
+                  format: float
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargerFullData'
+        '400':
+          description: Missing 'longitud' or 'latitud' in request body
+  /chargers/{id}/:
+    get:
+      tags:
+      - Charge Stations
+      summary: Get charger by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargerFullData'
+        '404':
+          description: Charger not found
+  /bikestations/all:
+    get:
+      tags:
+      - Bike Stations
+      summary: Get all bike stations
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BikestationLocation'
+  /bikestations/database:
+    post:
+      tags:
+      - Bike Stations
+      summary: Update bike stations database
+      responses:
+        '201':
+          description: Bike stations database updated
+components:
+  schemas:
+    BikestationLocation:
+      type: object
+      properties:
+        station_id:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+    ChargerLocation:
+      type: object
+      properties:
+        charger_id:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+
+    ChargerFullData:
+      type: object
+      properties:
+        charger_id:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        ac_dc:
+          type: string
+        acces:
+          type: string
+        address:
+          type: string
+        province_code:
+          type: string
+        mun:
+          type: string
+        charger_speed:
+          type: string
+        conection_type:
+          type: string
