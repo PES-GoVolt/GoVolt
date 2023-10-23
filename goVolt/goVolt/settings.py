@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+from database.firebaseConfig import firebaseConfig
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -75,9 +75,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'goVolt.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -90,18 +87,8 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 import pyrebase
 
-cred = credentials.Certificate("database/govolt-ea98b-firebase-adminsdk-zh4es-0b858f1221.json")
+cred = credentials.Certificate("database/goVoltDB.json")
 
-firebaseConfig = {
-  "apiKey": "AIzaSyDQyP4_8RMlTgkOzV9rLIuGNB7sIcI3HLQ",
-  "authDomain": "govolt-ea98b.firebaseapp.com",
-  "databaseURL": "https://govolt-ea98b-default-rtdb.europe-west1.firebasedatabase.app",
-  "projectId": "govolt-ea98b",
-  "storageBucket": "govolt-ea98b.appspot.com",
-  "messagingSenderId": "651822731614",
-  "appId": "1:651822731614:web:e3441bc1bd9ea2bda1ffcf",
-  "measurementId": "G-8P87F12XX2"
-}
 
 # autentificacion
 firebase_auth = pyrebase.initialize_app(firebaseConfig)
@@ -115,8 +102,6 @@ def get_firestore_db():
 
 FIREBASE_DB = get_firestore_db()
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
