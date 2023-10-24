@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from firebase_admin import auth, exceptions
+
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from goVolt.settings import AUTH_DB
+from api.auth.services import get_auth_user, store_user
 
 class LoginApiView(APIView):
     @csrf_exempt
@@ -21,39 +21,43 @@ class LoginApiView(APIView):
         # Recuperamos las credenciales y autenticamos al usuario
         email= request.data.get('email', None)
         password = request.data.get('password', None)
-        print(email)
-        print(password)
+
         if email is None or password is None:
-            return Response({'message': 'Es necesario introducir Email y Contraseña'},status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            auth_user = AUTH_DB.sign_in_with_email_and_password(email, password)
-        except ValueError as e:
-            return Response({'error': str(e)})
-        
-        print(auth_user)
+            return Response({'message': 'It is necessary to enter Email and Password'},status=status.HTTP_400_BAD_REQUEST)
 
-        if not auth_user:
-            return Response({'message': 'Email o Contraseña incorrecto.'},status=status.HTTP_404_NOT_FOUND)
+        result = get_auth_user(email, password)
 
-        # Si es correcto añadimos a la request la información de sesión
-        if auth_user:
-            # para loguearse una sola vez
-            return Response({'message':'Email y Contraseña correctos.'},status=status.HTTP_200_OK)
-            #return response.Response({'token': token.key}, status=status.HTTP_200_OK)
+        if isinstance(result, Exception):
+            # Verificar si result es una excepción
+            error_message = result.args[1]
+            error_data = json.loads(error_message)
+            code = error_data['error']['code']
+            msg = error_data['error']['message']
 
-        # Si no es correcto devolvemos un error en la petición
-        return Response(status=status.HTTP_404_NOT_FOUND)
+            if code == 200:
+                st = status.HTTP_200_OK
+            elif code == 400:
+                st = status.HTTP_400_BAD_REQUEST
+            elif code == 401:
+                st = status.HTTP_401_UNAUTHORIZED
+            elif code == 403:
+                st = status.HTTP_403_FORBIDDEN
+            elif code == 404:
+                st = status.HTTP_404_NOT_FOUND
+            elif code == 500:
+                st = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+            return Response({"message": msg}, status=st)
+
+        else:
+            # Si result no es una excepción, es el resultado exitoso
+            return Response({'message':'Successful Authentication'},status=status.HTTP_200_OK)
 
 class LogOutApiView(APIView):
     @login_required
     @csrf_exempt
     def post(self, request):
-        # Cerrar la sesión del usuario
-        # Esto puede variar dependiendo de cómo tengas configurada tu autenticación
-        # En el ejemplo, se borra el token de autenticación almacenado en el cliente
-        # para forzar el cierre de sesión
-        response = JsonResponse({'message': 'Logout successful'})
+        response = Response({'message': 'Logout successful'})
         response.delete_cookie('firebaseToken')  # Borra la cookie del token de Firebase
         return response
 
@@ -63,8 +67,6 @@ class RegisterApiView(APIView):
 
         data = json.loads(request.body)
 
-        # Obtén los datos de registro del formulario o la solicitud POST
-        #email = data.get('email')
         email = data.get('email')
         password = data.get('password')
         phone = data.get('phone')
@@ -72,16 +74,13 @@ class RegisterApiView(APIView):
         if len(password) < 6:
                 return Response({'message': 'Password must be at least 6 characters long'},status=status.HTTP_400_BAD_REQUEST)
         
-        try:
-            # Crea una cuenta de usuario en Firebase Authentication
-            user = auth.create_user(
-                email=email,
-                password=password,
-                phone_number=phone,
-            )
+        result = store_user(email, password, phone)
 
-            # El usuario se ha registrado correctamente
-            return Response({'message': 'Registration successful'},status=status.HTTP_200_OK)
-        except ValueError as e:
-            # Maneja cualquier error de autenticación
-            return Response({'message': 'Registration failed: ' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        print(result)
+        if isinstance(result, Exception):
+            # Verificar si result es una excepción
+            return Response({"message": str(result)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        else:
+            # Si result no es una excepción, es el resultado exitoso
+            return Response({'message':'Successful Registration'},status=status.HTTP_200_OK)

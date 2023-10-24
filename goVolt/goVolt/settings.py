@@ -90,7 +90,7 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 import pyrebase
 
-cred = credentials.Certificate("database/govolt-ea98b-firebase-adminsdk-zh4es-0b858f1221.json")
+cred = credentials.Certificate("database/govoltDB.json")
 
 firebaseConfig = {
   "apiKey": "AIzaSyDQyP4_8RMlTgkOzV9rLIuGNB7sIcI3HLQ",
@@ -130,7 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    }
 ]
 
 
