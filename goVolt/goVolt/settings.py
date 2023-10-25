@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+from database.firebaseConfig import firebaseConfig
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,8 +25,9 @@ SECRET_KEY = 'django-insecure-rgmwddxt^-xs3qzoia-6r!ollfrb6pv++bg(u=7o=24p7i&1_u
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+APPEND_SLASH = False
 
 # Application definition
 
@@ -37,9 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'api.chargers',
-    'api.users',
-    'rest_framework'
+    'api.bikestations',
+    'api.users'
 ]
 
 MIDDLEWARE = [
@@ -73,30 +75,33 @@ TEMPLATES = [
 WSGI_APPLICATION = 'goVolt.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.dummy',
-        'NAME': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-cred = credentials.Certificate("database\govolt-6ab4c-firebase-adminsdk-dcroz-d893031c11.json")
-firebase_admin.initialize_app(cred)
+import pyrebase
+
+cred = credentials.Certificate("database/goVoltDB.json")
+
+
+# autentificacion
+firebase_auth = pyrebase.initialize_app(firebaseConfig)
+AUTH_DB = firebase_auth.auth()
+
+# resto de tablas
+firebase = firebase_admin.initialize_app(cred)
 
 def get_firestore_db():
     return firestore.client()
 
 FIREBASE_DB = get_firestore_db()
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
