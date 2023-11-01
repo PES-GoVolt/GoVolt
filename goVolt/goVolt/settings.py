@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'api.chargers',
     'api.bikestations',
-    'api.users'
+    'api.users',
+    'api.chats',
+    'channels'
 ]
 
 MIDDLEWARE = [

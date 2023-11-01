@@ -22,5 +22,6 @@ urlpatterns = [
     path('api/chargers/',include('api.chargers.urls')),
     path('api/bikestations/',include('api.bikestations.urls')),
     path('api/auth/',include('api.auth.urls')),
-    path('api/users/',include('api.auth.urls'))
+    path('api/users/',include('api.auth.urls')),
+    path('api/messages/',include('api.chats.urls'))
 ]
