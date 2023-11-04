@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'channels'
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -75,8 +76,22 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'goVolt.wsgi.application'
+ASGI_APPLICATION = 'goVolt.asgi.application'
 
+""" CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    },
+} """
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
