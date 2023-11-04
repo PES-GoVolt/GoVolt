@@ -8,6 +8,13 @@ from goVolt.settings import FIREBASE_DB
 from firebase_admin import auth, exceptions
 from .serializers import UserSerializer
 
+def logout(request) :
+    try:
+        AUTH_DB.current_user = None
+        return 200
+    except Exception as e:
+        return e
+    
 def get_auth_user(email, password):
     
     try:
