@@ -53,9 +53,9 @@ def get_see_my_profile():
     # Obten el token de autenticación de la solicitud
     firebase_uid = AUTH_DB.current_user["localId"]
 
-    doc_ref = FIREBASE_DB.collection('users').document(firebase_uid)
+    user_ref = FIREBASE_DB.collection('users').document(firebase_uid)
 
-    res = doc_ref.get()
+    res = user_ref.get()
 
     data = {}
     data['first_name'] =  res.get('first_name')
@@ -70,3 +70,27 @@ def get_see_my_profile():
         return serializer.data
     else:
         raise serializer.ValidationError(serializer.errors)
+    
+def edit_user(first_name, last_name, phone, photo_url):
+    # Verifica si el usuario está autenticado
+    if not AUTH_DB.current_user:
+        return 401  # Código de estado HTTP para no autorizado
+
+    # Crea una cuenta de usuario en Firebase Authentication
+    try:
+
+        # Obten el token del usuario registrado
+        firebase_uid = AUTH_DB.current_user["localId"]
+
+        user_ref = FIREBASE_DB.collection('users').document(firebase_uid)
+
+        user_ref.update({
+            'first_name': first_name,
+            'last_name': last_name,
+            'phone': phone,
+            'photo_url': photo_url,
+        })
+
+        return 200
+    except Exception as e:
+        return e
