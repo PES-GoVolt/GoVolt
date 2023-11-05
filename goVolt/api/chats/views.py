@@ -6,12 +6,6 @@ from .services import save_message
 from rest_framework.response import Response
 
 
-def room(request, room_name):
-    username = request.GET.get('username','Anonymous')
-    
-    messages = get_all_messages(room_name)
-    return render(request,'test.html',{'room_name':room_name,'username':username,'messages':messages})
-
 class ChatsAPIView(APIView):
     def post(self,request):
         serializer = MessageSerializer(data=request.data)
