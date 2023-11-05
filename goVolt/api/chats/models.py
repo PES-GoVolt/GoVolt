@@ -8,3 +8,5 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     room_name = models.CharField(max_length=100)
+
+

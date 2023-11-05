@@ -4,7 +4,6 @@ from rest_framework.views import APIView
 from .serializers import MessageSerializer
 from .services import save_message,get_all_messages
 from rest_framework.response import Response
-from .utils import send_message_consumer
 
 
 def room(request, room_name):
@@ -17,8 +16,11 @@ class ChatsAPIView(APIView):
     def post(self,request):
         serializer = MessageSerializer(data=request.data)
         if serializer.is_valid():
-            save_message(request.data)
-            send_message_consumer(request.data, request.data['room_name'])
+            data = request.data
+            message = data['content']
+            room_name = data['room_name']
+            sender = data['sender']
+            save_message(message,room_name,sender)
             return Response({'message':'Message created'},status=status.HTTP_201_CREATED)
 
         else:

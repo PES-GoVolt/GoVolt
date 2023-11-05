@@ -1,32 +1,29 @@
-from goVolt.settings import FIREBASE_DB
-from google.cloud import firestore
+from goVolt.settings import FIREBASE_DB_REALTIME_URL
 from datetime import datetime
 
-def save_message(message):
-    collection_name = 'messages'
-    collection_ref = FIREBASE_DB.collection(collection_name)
+from firebase_admin import db
+import json
 
+def save_message(message,room_name,sender):
+    ref = db.reference("/")
 
     current_datetime = datetime.now()
+    unix_timestamp = current_datetime.timestamp()
 
     messagedata = {
-        "content": message['content'],
-        "room_name": message['room_name'],
-        "sender": message['sender'],
-        "timestamp": current_datetime
+        "content": message,
+        "room_name": room_name,
+        "sender": sender,
+        "timestamp": unix_timestamp
     }
-    collection_ref.add(messagedata)
+    message_node = ref.child(room_name).push()
+    message_node.set(messagedata)
 
-def get_all_messages(room_name):
-    collection_name = 'messages'
-    collection_ref = FIREBASE_DB.collection(collection_name)
 
-    query = collection_ref.where('room_name','==',room_name).order_by('timestamp')
-    docs = query.stream()
 
-    messages = []
 
-    for doc in docs:
-        doc_data = doc.to_dict()
-        messages.append(doc_data)  
-    return messages
+
+
+
+
+    
