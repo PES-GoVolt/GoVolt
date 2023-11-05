@@ -20,10 +20,22 @@ def save_message(message,room_name,sender):
     message_node.set(messagedata)
 
 
-
-
-
-
+def get_room_messages(room_name):
+    ref = db.reference('/' + room_name)
+    messages_data = ref.get()
+    messages = []
+    if messages_data:
+            for message_id, message_info in messages_data.items():
+                if 'content' in message_info:
+                    message = {
+                        'content': message_info['content'],
+                        'room_name': message_info['room_name'],
+                        'sender': message_info['sender'],
+                        'timestamp': datetime.fromtimestamp(message_info['timestamp'])
+                    }
+                    messages.append(message)
+            messages = sorted(messages, key=lambda x: x['timestamp'])
+    return messages
 
 
     
