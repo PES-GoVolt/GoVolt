@@ -25,6 +25,9 @@ class ChatsAPIView(APIView):
 
         else:
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) 
+    '''
     def get(self,request):
         group = request.data['room_name']
         return Response({'messages':get_all_messages(group)},status=status.HTTP_200_OK)
+
+    '''
