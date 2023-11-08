@@ -88,6 +88,99 @@ paths:
       responses:
         '201':
           description: Bike stations database updated
+  /users/login/:
+    post:
+      tags:
+      - Authentication
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful Authentication
+        '400':
+          description: Invalid email or password
+  /users/logout/:
+    post:
+      tags:
+      - Authentication
+      summary: User logout
+      responses:
+        '200':
+          description: Successful logout
+        '401':
+          description: Unauthorized
+  /users/register/:
+    post:
+      tags:
+      - Authentication
+      summary: User registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                phone:
+                  type: string
+      responses:
+        '200':
+          description: Successful Registration
+        '400':
+          description: Invalid registration data
+  /users/see-my-profile/:
+    get:
+      tags:
+      - User Profile
+      summary: Get user profile
+      responses:
+        '200':
+          description: Successful profile retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+  /users/edit-my-profile/:
+    post:
+      tags:
+      - User Profile
+      summary: Edit user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                phone:
+                  type: string
+                photo_url:
+                  type: string
+      responses:
+        '200':
+          description: Successful Edit
+        '400':
+          description: Invalid profile data
 components:
   schemas:
     BikestationLocation:
@@ -112,7 +205,6 @@ components:
         longitude:
           type: number
           format: float
-
     ChargerFullData:
       type: object
       properties:
@@ -138,3 +230,24 @@ components:
           type: string
         conection_type:
           type: string
+    User:
+      type: object
+      properties:
+        firebase_uid:
+          type: integer
+          format: int64
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        photo_url:
+          type: string
+      required:
+        - id
+        - first_name
+        - last_name
+        - email
