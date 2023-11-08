@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import MessageSerializer
-from .services import save_message
+from .services import save_message,get_room_messages
 from rest_framework.response import Response
 
 
@@ -19,9 +19,9 @@ class ChatsAPIView(APIView):
 
         else:
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) 
-    '''
+    
     def get(self,request):
-        group = request.data['room_name']
-        return Response({'messages':get_all_messages(group)},status=status.HTTP_200_OK)
+        room = request.data.get('room_name','')
+        messages = get_room_messages(room)
+        return Response({'messages':messages},status=status.HTTP_200_OK)
 
-    '''
