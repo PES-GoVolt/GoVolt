@@ -4,4 +4,8 @@ from .models import RutaViaje
 class RutaViajeSerializer(serializers.ModelSerializer):
     class Meta:
         model = RutaViaje
-        fields = '__all__'
+        fields = ['ubicacion_inicial', 'ubicacion_final', 'precio', 'num_plazas', 'fecha', 'creador', 'participantes']
+        extra_kwargs = {
+            'creador': {'required': False},
+            'participantes': {'required': False}
+        }
