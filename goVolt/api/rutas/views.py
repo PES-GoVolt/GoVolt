@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import RutaViaje
-from api.rutas.services import store_ruta,get_mis_rutas
+from api.rutas.services import store_ruta,get_mis_rutas, get_all_rutas
 
 # Create your views here.
 class CrearRutaViajeView(APIView):
@@ -28,9 +28,12 @@ class CrearRutaViajeView(APIView):
 
         else:
             # Si result no es una excepción, es el resultado exitoso
-            return Response({'message':'Successful Registration'},status=status.HTTP_200_OK)
+            return Response({'message':result.data.get('message')},status=status.HTTP_200_OK)
 
-# Create your views here.
 class GetMisRutasView(APIView):
     def get(self,request):
         return Response({'rutas':get_mis_rutas()},status=status.HTTP_200_OK)
+
+class GetAllRutasView(APIView):
+    def get(self,request):
+        return Response({'rutas':get_all_rutas()},status=status.HTTP_200_OK)

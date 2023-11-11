@@ -12,7 +12,7 @@ from rest_framework.exceptions import ValidationError
 from api.users.models import CustomUser
 
 def store_ruta(data):
-    # Crea una cuenta de usuario en Firebase Authentication
+
     try:   
 
         creador_id = AUTH_DB.current_user["localId"]
@@ -29,17 +29,13 @@ def store_ruta(data):
             return Response({'message': new_ruta[1].id},status=200)
         else:
             raise ValidationError(serializer.errors)
-
-        # Obten el token de autenticación de la solicitud
-
         
     except Exception as e:
-
         return Response({'message': str(e)},status=400)
 
 def get_mis_rutas():
-    #creador_id = AUTH_DB.current_user["localId"]
-    creador_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+    creador_id = AUTH_DB.current_user["localId"]
+    #creador_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
 
     rutas_ref = FIREBASE_DB.collection('rutas')
     rutas = rutas_ref.where('creador', '==', creador_id).get()
@@ -48,9 +44,24 @@ def get_mis_rutas():
     rutas_encontradas = []
     for resultado in rutas:
         datos_ruta = resultado.to_dict()
+        # Agrega el identificador del documento a los datos de la ruta
+        datos_ruta['id'] = resultado.id
         rutas_encontradas.append(datos_ruta)
     
     return rutas_encontradas
 
+def get_all_rutas():
 
+    rutas_ref = FIREBASE_DB.collection('rutas')
+    rutas = rutas_ref.get()
+
+    # Itera sobre los resultados para obtener los datos de las rutas encontradas
+    rutas_encontradas = []
+    for resultado in rutas:
+        datos_ruta = resultado.to_dict()
+        # Agrega el identificador del documento a los datos de la ruta
+        datos_ruta['id'] = resultado.id
+        rutas_encontradas.append(datos_ruta)
+    
+    return rutas_encontradas
 
