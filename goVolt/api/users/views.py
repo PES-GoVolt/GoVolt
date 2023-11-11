@@ -103,27 +103,9 @@ class RegisterApiView(APIView):
         result = store_user(email, password, phone)
 
         if isinstance(result, Exception):
+            print(result)
             # Verificar si result es una excepción
-            error_message = result.args[1]
-            error_data = json.loads(error_message)
-
-            code = error_data['error']['code']
-            msg = error_data['error']['message']
-
-            if code == 200:
-                st = status.HTTP_200_OK
-            elif code == 400:
-                st = status.HTTP_400_BAD_REQUEST
-            elif code == 401:
-                st = status.HTTP_401_UNAUTHORIZED
-            elif code == 403:
-                st = status.HTTP_403_FORBIDDEN
-            elif code == 404:
-                st = status.HTTP_404_NOT_FOUND
-            elif code == 500:
-                st = status.HTTP_500_INTERNAL_SERVER_ERROR
-
-            return Response({"message": msg}, status=st)
+            return Response({'message': 'Registration failed: ' + str(result)}, status=status.HTTP_400_BAD_REQUEST)
 
         else:
             # Si result no es una excepción, es el resultado exitoso
