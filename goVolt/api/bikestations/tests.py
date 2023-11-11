@@ -11,7 +11,6 @@ class BikestationsLocationApiViewTest(TestCase):
         response = client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
 class BikestationsDataBaseApiViewTest(TestCase):
     def test_bikestations_data_base_view(self):
         client = APIClient()

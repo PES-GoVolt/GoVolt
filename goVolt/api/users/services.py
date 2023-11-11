@@ -7,13 +7,22 @@ from goVolt.settings import AUTH_DB
 from goVolt.settings import FIREBASE_DB
 from firebase_admin import auth, exceptions
 from .serializers import UserSerializer
+import json
+from rest_framework.response import Response
 
 def logout(request) :
     try:
         AUTH_DB.current_user = None
-        return 200
+        
+        return Response({'message': "OK"},status=200)
     except Exception as e:
-        return e
+        error_message = e.args[1]
+        error_data = json.loads(error_message)
+
+        code = error_data['error']['code']
+        msg = error_data['error']['message']
+
+        return Response({'message': msg},status=code)
     
 def get_auth_user(email, password):
     
@@ -21,12 +30,16 @@ def get_auth_user(email, password):
         AUTH_DB.sign_in_with_email_and_password(email, password)
 
         #user = FIREBASE_DB.collection('users').document(firebase_uid).get()
-
-        return 200
+        return Response({'message': "OK"},status=200)
     except Exception as e:
-        return e
-        
+        error_message = e.args[1]
+        error_data = json.loads(error_message)
 
+        code = error_data['error']['code']
+        msg = error_data['error']['message']
+
+        return Response({'message': msg},status=code)
+        
 def store_user(email, password, phone):
     # Crea una cuenta de usuario en Firebase Authentication
     try:
@@ -51,10 +64,12 @@ def store_user(email, password, phone):
         # Crea un documento con el ID del usuario (UID) y almacena los datos
         collection_ref.document(user.uid).set(user_data)
 
-        return 200
+        #user = FIREBASE_DB.collection('users').document(firebase_uid).get()
+        return Response({'message': "OK"},status=200)
     except Exception as e:
-        return e
 
+        return Response({'message': str(e)},status=400)
+    
 def get_see_my_profile():
 
     # Obten el token de autenticación de la solicitud
@@ -81,7 +96,7 @@ def get_see_my_profile():
 def edit_user(first_name, last_name, phone, photo_url):
     # Verifica si el usuario está autenticado
     if not AUTH_DB.current_user:
-        return 401  # Código de estado HTTP para no autorizado
+        return Response({'message': "UNAUTHORIZED_USER"},status=401)
 
     # Crea una cuenta de usuario en Firebase Authentication
     try:
@@ -98,6 +113,12 @@ def edit_user(first_name, last_name, phone, photo_url):
             'photo_url': photo_url,
         })
 
-        return 200
+        return Response({'message': "OK"},status=200)
     except Exception as e:
-        return e
+        error_message = e.args[1]
+        error_data = json.loads(error_message)
+
+        code = error_data['error']['code']
+        msg = error_data['error']['message']
+
+        return Response({'message': msg},status=code)
