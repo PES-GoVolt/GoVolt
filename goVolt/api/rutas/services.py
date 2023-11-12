@@ -34,8 +34,8 @@ def store_ruta(data):
         return Response({'message': str(e)},status=400)
 
 def get_mis_rutas():
-    creador_id = AUTH_DB.current_user["localId"]
-    #creador_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+    #creador_id = AUTH_DB.current_user["localId"]
+    creador_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
 
     rutas_ref = FIREBASE_DB.collection('rutas')
     rutas = rutas_ref.where('creador', '==', creador_id).get()
@@ -65,3 +65,57 @@ def get_all_rutas():
     
     return rutas_encontradas
 
+def get_ruta_by_id(id):
+
+    doc_ref = FIREBASE_DB.collection('rutas').document(id)
+
+    res = doc_ref.get()
+
+    data = {}
+    data['id'] = id
+    data['ubicacion_inicial'] =  res.get('ubicacion_inicial')
+    data['ubicacion_final'] =  res.get('ubicacion_final')
+    data['precio']= res.get('precio')
+    data['num_plazas']= res.get('num_plazas')
+    data['fecha']= res.get('fecha')
+    data['creador']= res.get('creador')
+    #data['participantes']= res.get('participantes')
+
+    serializer = RutaViajeSerializer(data=data)
+    if serializer.is_valid():
+        return serializer.data
+    else:
+        raise serializers.ValidationError(serializer.errors)
+
+def edit_ruta(id, ubicacion_inicial, ubicacion_final, precio, num_plazas, fecha, creador):
+
+    try:
+
+        # Obten el usuario autentificado
+        firebase_uid = AUTH_DB.current_user["localId"]
+        #firebase_uid = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+
+        ruta_ref = FIREBASE_DB.collection('rutas').document(id)
+        
+        #comprueba que el usuario que edita la ruta sea el creador
+        if (firebase_uid == creador):
+            ruta_ref.update({
+                'ubicacion_inicial': ubicacion_inicial,
+                'ubicacion_final': ubicacion_final,
+                'precio': precio,
+                'num_plazas': num_plazas,
+                'fecha': fecha
+            })
+
+            return Response({'message': "OK"},status=200)
+        else:
+            return Response({'message': "USER UNAUTHORIZED"}, status=401)
+        
+    except Exception as e:
+        error_message = e.args[1]
+        error_data = json.loads(error_message)
+
+        code = error_data['error']['code']
+        msg = error_data['error']['message']
+
+        return Response({'message': msg},status=code)
