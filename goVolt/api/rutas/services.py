@@ -19,6 +19,7 @@ def store_ruta(data):
         #creador_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
 
         data['creador'] = creador_id
+        data['participantes'] = None
 
         serializer = RutaViajeSerializer(data=data)
 
@@ -34,8 +35,8 @@ def store_ruta(data):
         return Response({'message': str(e)},status=400)
 
 def get_mis_rutas():
-    #creador_id = AUTH_DB.current_user["localId"]
-    creador_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+    creador_id = AUTH_DB.current_user["localId"]
+    #creador_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
 
     rutas_ref = FIREBASE_DB.collection('rutas')
     rutas = rutas_ref.where('creador', '==', creador_id).get()
@@ -111,6 +112,50 @@ def edit_ruta(id, ubicacion_inicial, ubicacion_final, precio, num_plazas, fecha,
         else:
             return Response({'message': "USER UNAUTHORIZED"}, status=401)
         
+    except Exception as e:
+        error_message = e.args[1]
+        error_data = json.loads(error_message)
+
+        code = error_data['error']['code']
+        msg = error_data['error']['message']
+
+        return Response({'message': msg},status=code)
+
+def add_participant(ruta_id, participant_id):
+    try:
+
+        # Obten el usuario autentificado
+        #firebase_uid = AUTH_DB.current_user["localId"]
+        logged_user = "cNtxKjlvPTM6TE6aaTC6mjl1hj126"
+
+        ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
+        res = ruta_ref.get()
+
+        creador_ruta = res.get("creador")
+        participante = participant_id
+
+        # si el que añade no es el creador ni el participante => error
+        if(logged_user == creador_ruta or logged_user == participante):
+            # comprobar que num_plazas > count(participantes)
+            participantes = res.get("participantes")
+
+            if (participantes == None):
+                participantes = []
+
+            if participant_id not in participantes:
+                if (res.get("num_plazas") > len(participantes)):
+                    participantes.append(participant_id)
+                    ruta_ref.update({"participantes": participantes})
+
+                    return Response({'message': "OK"},status=200)
+
+                else:
+                    return Response({'message': "TOO MANY PARTICIPANTS"}, status=500)
+            else:
+                return Response({'message': "PARTICIPANT ALREADY EXIST"}, status=500)
+        else:
+            return Response({'message': "USER UNAUTHORIZED"}, status=401)
+
     except Exception as e:
         error_message = e.args[1]
         error_data = json.loads(error_message)

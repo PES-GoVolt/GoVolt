@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CrearRutaViajeView, GetMisRutasView, GetAllRutasView, GetRutaByIdView, EditarRutaViajeView
+from .views import CrearRutaViajeView, GetMisRutasView, GetAllRutasView, GetRutaByIdView, EditarRutaViajeView, AddParticipantRutaViajeView
 
 urlpatterns = [
     #crear una ruta
@@ -12,6 +12,9 @@ urlpatterns = [
     path('edit/<str:id>/', EditarRutaViajeView.as_view(), name='edit-route'),
     # listar todas las rutas
     path('', GetAllRutasView.as_view(), name='get-all-routes'),
-    # añadir participantes a rutas
+    # añadir participante a ruta
+    path('add_participant/<str:ruta_id>/<str:participant_id>/', AddParticipantRutaViajeView.as_view(), name='add-participant-route'),
+    # eliminar participante de ruta
+
     # obtener rutas en las que soy participante
 ]
