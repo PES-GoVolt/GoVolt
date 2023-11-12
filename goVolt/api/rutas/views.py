@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import RutaViaje
-from api.rutas.services import store_ruta,get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant
+from api.rutas.services import store_ruta,get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, get_routes_participadas
 import json
 
 # Create your views here.
@@ -48,7 +48,7 @@ class GetRutaByIdView(APIView):
             return Response({"error": "Ruta not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class EditarRutaViajeView(APIView):
-    def post(seld, request, id):
+    def post(self, request, id):
         data = json.loads(request.body)
 
         ubicacion_inicial = data.get('ubicacion_inicial')
@@ -84,7 +84,7 @@ class EditarRutaViajeView(APIView):
             return Response({'message':'Successful Edit'},status=status.HTTP_200_OK)
         
 class AddParticipantRutaViajeView(APIView):
-    def post(seld, request, ruta_id, participant_id):
+    def post(self, request, ruta_id, participant_id):
 
         # Get the route instance
         result = add_participant(ruta_id, participant_id)
@@ -111,4 +111,11 @@ class AddParticipantRutaViajeView(APIView):
         else:
             # Si result no es una excepción, es el resultado exitoso
             return Response({'message':'Successful Edit'},status=status.HTTP_200_OK)
-    
+
+class GetRutasParticipadasView(APIView):
+    def get(self, request):
+        rutas = get_routes_participadas()
+        if rutas is not None:
+            return Response({"rutas": rutas}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Routes not found"}, status=status.HTTP_404_NOT_FOUND)
