@@ -167,8 +167,8 @@ def add_participant(ruta_id, participant_id):
 
 def get_routes_participadas():
     try:
-        participant_id = AUTH_DB.current_user["localId"]
-        #participant_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj120"
+        #participant_id = AUTH_DB.current_user["localId"]
+        participant_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
         # Query Firestore for routes where the participant is in the participantes array
         routes_ref = FIREBASE_DB.collection('rutas')
         query = routes_ref.where('participantes', 'array_contains', participant_id)
@@ -187,3 +187,40 @@ def get_routes_participadas():
         print(str(e))
         # Handle other exceptions if necessary
         return []
+    
+def remove_participant(ruta_id, participant_id):
+    try:
+
+        # Obten el usuario autentificado
+        #logged_user = AUTH_DB.current_user["localId"]
+        logged_user = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+
+        ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
+        res = ruta_ref.get()
+
+        creador_ruta = res.get("creador")
+        participante = participant_id
+
+        # si el que añade no es el creador ni el participante => error
+        if(logged_user == creador_ruta or logged_user == participante):
+
+            participantes = res.get("participantes")
+
+            if participant_id in participantes:
+                participantes.remove(participant_id)
+                ruta_ref.update({"participantes": participantes})
+
+                return Response({'message': "OK"},status=200)
+            else:
+                return Response({'message': "PARTICIPANT NOT EXIST"}, status=500)
+        else:
+            return Response({'message': "USER UNAUTHORIZED"}, status=401)
+
+    except Exception as e:
+        error_message = e.args[1]
+        error_data = json.loads(error_message)
+
+        code = error_data['error']['code']
+        msg = error_data['error']['message']
+
+        return Response({'message': msg},status=code)
