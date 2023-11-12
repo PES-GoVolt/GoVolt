@@ -8,7 +8,7 @@ def save_message(message,room_name,sender):
     ref = db.reference("/")
 
     current_datetime = datetime.now()
-    unix_timestamp = current_datetime.timestamp()
+    unix_timestamp = int(current_datetime.timestamp() * 1000)
 
     messagedata = {
         "content": message,
@@ -31,7 +31,7 @@ def get_room_messages(room_name):
                         'content': message_info['content'],
                         'room_name': message_info['room_name'],
                         'sender': message_info['sender'],
-                        'timestamp': datetime.fromtimestamp(message_info['timestamp'])
+                        'timestamp': message_info['timestamp']
                     }
                     messages.append(message)
             messages = sorted(messages, key=lambda x: x['timestamp'])
