@@ -181,6 +181,180 @@ paths:
           description: Successful Edit
         '400':
           description: Invalid profile data
+  /rutas/:
+    get:
+      tags:
+      - Rutas
+      summary: Get all routes
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RutaViaje'
+  /rutas/create/:
+    post:
+      tags:
+      - Rutas
+      summary: Create a new route
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RutaViaje'
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /rutas/my/:
+    get:
+      tags:
+      - Rutas
+      summary: Get routes created by the user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RutaViaje'
+  /rutas/participant_route/:
+    get:
+      tags:
+      - Rutas
+      summary: Get routes in which the user is a participant
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RutaViaje'
+  /rutas/{id}/:
+    get:
+      tags:
+      - Rutas
+      summary: Get route by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RutaViaje'
+        '404':
+          description: Route not found
+  /rutas/edit/{id}/:
+    post:
+      tags:
+      - Rutas
+      summary: Edit route information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RutaViaje'
+      responses:
+        '200':
+          description: Successful Edit
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /rutas/add_participant/{ruta_id}/{participant_id}/:
+    post:
+      tags:
+      - Rutas
+      summary: Add participant to route
+      parameters:
+        - name: ruta_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: participant_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /rutas/remove_participant/{ruta_id}/{participant_id}/:
+    post:
+      tags:
+      - Rutas
+      summary: Remove participant from route
+      parameters:
+        - name: ruta_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: participant_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
 components:
   schemas:
     BikestationLocation:
@@ -251,3 +425,30 @@ components:
         - first_name
         - last_name
         - email
+    RutaViaje:
+      type: object
+      properties:
+        ubicacion_inicial:
+          type: string
+        ubicacion_final:
+          type: string
+        precio:
+          type: number
+          format: float
+        num_plazas:
+          type: integer
+        fecha:
+          type: string
+        creador:
+          type: string
+        participantes:
+          type: array
+          items:
+            type: string
+      required:
+        - ubicacion_inicial
+        - ubicacion_final
+        - precio
+        - num_plazas
+        - fecha
+        - creador

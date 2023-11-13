@@ -21,7 +21,7 @@ class ChatsAPIView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) 
     
     def get(self,request):
-        room = request.data.get('room_name','')
+        room = request.query_params.get('room_name','')
         messages = get_room_messages(room)
         return Response({'messages':messages},status=status.HTTP_200_OK)
 

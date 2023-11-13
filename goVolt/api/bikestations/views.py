@@ -9,6 +9,7 @@ from api.bikestations.services import store_data_stations, read_data_stations, d
 class BikeStationsApiView(APIView):
     def get(self,request):
         return Response(get_all_bikestations(),status=status.HTTP_200_OK)
+
 class BikeStationsDatabaseApiView(APIView):
     def post(self,request):
         bikestations = read_data_stations()
