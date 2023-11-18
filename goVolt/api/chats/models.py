@@ -12,4 +12,4 @@ class Message(models.Model):
 class Chat(models.Model):
     idUser = models.CharField(max_length=128, unique=True, null=True, default=None)
     room_name = models.CharField(max_length=100)
-    last_conection =  models.DateTimeField()
+    last_conection =  models.IntegerField()

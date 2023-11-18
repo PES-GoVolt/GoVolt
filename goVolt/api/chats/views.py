@@ -39,9 +39,9 @@ class ChatsAPIView(APIView):
         return Response({'message' : 'Chat created'},status=status.HTTP_201_CREATED)
 
     def get(self,request):
-        id_chat = request.data['id_chat']
+        id_chat = request.query_params.get('id_chat','')
         chats = get_chat(id_chat)
-        
+
         return Response({'chats':chats},status=status.HTTP_200_OK)
         #devolver todo para el usuario loged
 

@@ -74,10 +74,8 @@ def get_chat(id_chat):
     chat_ref = FIREBASE_DB.collection(collection_name).document(id_chat)
     res = chat_ref.get()
     data = {}
-    last_conection_unix_timestamp = res.get('last_conection')
-    last_conection_datetime = datetime.utcfromtimestamp(last_conection_unix_timestamp / 1000.0)
     data['room_name'] = res.get('room_name')
-    data['last_conection'] = last_conection_datetime
+    data['last_conection'] = res.get('last_conection')
     data['userUid'] = res.get('userUid')
     serializer = ChatSerializer(data=data,many=False)
     if serializer.is_valid():
