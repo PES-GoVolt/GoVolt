@@ -15,7 +15,7 @@ class ChargerLocationApiViewTest(TestCase):
 class ChargerDataBaseApiViewTest(TestCase):
     def test_charger_data_base_view(self):
         client = APIClient()
-        url = reverse('chargers-database')
+        url = reverse('chargers-database')  
         response = client.post(url)
         self.assertEqual(response.status_code,status.HTTP_201_CREATED)
 

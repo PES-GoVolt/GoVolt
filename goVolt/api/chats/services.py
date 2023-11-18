@@ -1,8 +1,11 @@
-from goVolt.settings import FIREBASE_DB_REALTIME_URL
+from goVolt.settings import FIREBASE_DB,AUTH_DB
 from datetime import datetime
 
 from firebase_admin import db
 import json
+from .utils import get_timestamp_now
+from .serializers import MessageSerializer,ChatSerializer 
+from rest_framework import serializers
 
 def save_message(message,room_name,sender):
     ref = db.reference("/")
@@ -35,7 +38,50 @@ def get_room_messages(room_name):
                     }
                     messages.append(message)
             messages = sorted(messages, key=lambda x: x['timestamp'])
+            serializer = MessageSerializer(data=messages,many=True)
+            if serializer.is_valid():
+                return serializer.data
+            else:
+                raise serializers.ValidationError(serializer.errors)
     return messages
 
 
+def modify_timestamp_chat(id_chat):
+    collection_name = 'chats'
+    chat_ref = FIREBASE_DB.collection(collection_name).document(id_chat)
+    chat_info = chat_ref.get()
+    chat_info["last_conection"] = get_timestamp_now()
+    chat_ref.update(chat_info)
+
+
+def save_chat(userUid,room_name):
+    collection_name = 'chats'
+    collection_ref = FIREBASE_DB.collection(collection_name)
+    collection_ref.add({
+         "userUid": userUid,
+         "room_name" : room_name,
+         "last_conection" : get_timestamp_now()
+    })
     
+    logged_uid = AUTH_DB.current_user["localId"]
+    collection_ref.add({
+         "userUid": logged_uid,
+         "room_name" : room_name,
+         "last_conection" : get_timestamp_now()
+    })
+def get_chat(id_chat):
+    collection_name = 'chats'
+    chat_ref = FIREBASE_DB.collection(collection_name).document(id_chat)
+    res = chat_ref.get()
+    data = {}
+    last_conection_unix_timestamp = res.get('last_conection')
+    last_conection_datetime = datetime.utcfromtimestamp(last_conection_unix_timestamp / 1000.0)
+    data['room_name'] = res.get('room_name')
+    data['last_conection'] = last_conection_datetime
+    data['userUid'] = res.get('userUid')
+    serializer = ChatSerializer(data=data,many=False)
+    if serializer.is_valid():
+        return serializer.data
+    else:
+        raise serializers.ValidationError(serializer.errors)
+   

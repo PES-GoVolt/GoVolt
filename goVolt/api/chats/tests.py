@@ -4,10 +4,10 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 import json
 
-class ChatsAPIViewTest(TestCase):
+class MessagesAPIViewTest(TestCase):
     def test_send_message(self):
         client = APIClient()
-        url = reverse('chats-view')
+        url = reverse('messages-view')
         data = {
             "content" : "Hello",
             "room_name" : "random_room",
@@ -19,7 +19,7 @@ class ChatsAPIViewTest(TestCase):
 
     def test_get_messages_room(self):
         client = APIClient()
-        url = reverse('chats-view')
+        url = reverse('messages-view')
         data = {
             "room_name": "qwerty3"
         }
