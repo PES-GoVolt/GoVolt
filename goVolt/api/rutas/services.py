@@ -16,7 +16,6 @@ def store_ruta(data):
     try:
 
         creador_id = AUTH_DB.current_user["localId"]
-        # creador_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
 
         data['creador'] = creador_id
         data['participantes'] = None
@@ -37,7 +36,6 @@ def store_ruta(data):
 
 def get_mis_rutas():
     creador_id = AUTH_DB.current_user["localId"]
-    # creador_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
 
     rutas_ref = FIREBASE_DB.collection('rutas')
     rutas = rutas_ref.where('creador', '==', creador_id).get()
@@ -95,7 +93,6 @@ def edit_ruta(id, ubicacion_inicial, ubicacion_final, precio, num_plazas, fecha,
 
         # Obten el usuario autentificado
         firebase_uid = AUTH_DB.current_user["localId"]
-        # firebase_uid = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
 
         ruta_ref = FIREBASE_DB.collection('rutas').document(id)
 
@@ -128,7 +125,6 @@ def add_participant(ruta_id, participant_id):
 
         # Obten el usuario autentificado
         logged_user = AUTH_DB.current_user["localId"]
-        # logged_user = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
 
         ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
         res = ruta_ref.get()
@@ -170,34 +166,28 @@ def add_participant(ruta_id, participant_id):
 
 def get_routes_participadas():
     try:
-        # participant_id = AUTH_DB.current_user["localId"]
         participant_id = AUTH_DB.current_user["localId"]
-        # Query Firestore for routes where the participant is in the participantes array
+
         routes_ref = FIREBASE_DB.collection('rutas')
         query = routes_ref.where('participantes', 'array_contains', participant_id)
         routes = query.stream()
 
-        # Iterate over the results to get the data of the routes found
         routes_found = []
         for route in routes:
             route_data = route.to_dict()
-            route_data['id'] = route.id  # Add the document ID to the data
+            route_data['id'] = route.id
             routes_found.append(route_data)
 
         return routes_found
 
     except Exception as e:
         print(str(e))
-        # Handle other exceptions if necessary
         return []
 
 
 def remove_participant(ruta_id, participant_id):
     try:
-
-        # Obten el usuario autentificado
-        # logged_user = AUTH_DB.current_user["localId"]
-        logged_user = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+        logged_user = AUTH_DB.current_user["localId"]
 
         ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
         res = ruta_ref.get()
