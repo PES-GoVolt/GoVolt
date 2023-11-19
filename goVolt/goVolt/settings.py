@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'api.bikestations',
     'api.users',
     'api.chats',
-    'api.rutas'
+    #'api.rutas'
 ]
 
 MIDDLEWARE = [

@@ -69,15 +69,20 @@ def save_chat(userUid,room_name):
          "room_name" : room_name,
          "last_conection" : get_timestamp_now()
     })
-def get_chat(id_chat):
+def get_chats_user_loged():
     collection_name = 'chats'
-    chat_ref = FIREBASE_DB.collection(collection_name).document(id_chat)
-    res = chat_ref.get()
-    data = {}
-    data['room_name'] = res.get('room_name')
-    data['last_conection'] = res.get('last_conection')
-    data['userUid'] = res.get('userUid')
-    serializer = ChatSerializer(data=data,many=False)
+    logged_uid = AUTH_DB.current_user["localId"]
+    chat_ref = FIREBASE_DB.collection(collection_name)
+    query = chat_ref.where('userUid','==',logged_uid).order_by('last_conection')
+    docs = query.get()
+    chats = []
+    for doc in docs:
+        data = doc.to_dict()
+        data['room_name'] = data.get('room_name')
+        data['last_conection'] = data.get('last_conection')
+        data['userUid'] = data.get('userUid')
+        chats.append(data)
+    serializer = ChatSerializer(data=chats, many=True)
     if serializer.is_valid():
         return serializer.data
     else:
