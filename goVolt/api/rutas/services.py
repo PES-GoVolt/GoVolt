@@ -18,9 +18,13 @@ def store_ruta(data):
 
         creador_id = AUTH_DB.current_user["localId"]
         #creador_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+        
+        users_ref = FIREBASE_DB.collection('users')
+        user = users_ref.where('firebase_uid', '==', creador_id).get()[0].to_dict()
 
         data['creador'] = creador_id
         data['participantes'] = None
+        data['creador_email'] = user['email']
 
         serializer = RutaViajeSerializer(data=data)
 
@@ -55,7 +59,7 @@ def get_mis_rutas():
 def get_all_rutas():
 
     logged_id = AUTH_DB.current_user["localId"]
-    #logged_id = 'cNtxKjlvPTM6TE6aaTC6mjl1hj12'
+    #logged_id = 'cNtxKjlvPTM6TE6aaTC6mjl1hj13'
 
     rutas_no_creadas_ref = FIREBASE_DB.collection('rutas').where('creador', '!=', logged_id)
     rutas_no_creadas = rutas_no_creadas_ref.get()
@@ -89,6 +93,7 @@ def get_ruta_by_id(id):
     data['num_plazas']= res.get('num_plazas')
     data['fecha']= res.get('fecha')
     data['creador']= res.get('creador')
+    data['creador_email']= res.get('creador_email')
     #data['participantes']= res.get('participantes')
 
     serializer = RutaViajeSerializer(data=data)

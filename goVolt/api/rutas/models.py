@@ -9,6 +9,7 @@ class RutaViaje(models.Model):
     num_plazas = models.IntegerField(null=False, blank=False)
     fecha = models.DateField(null=False, blank=False)
     creador = models.CharField(max_length=128, null=False, blank=False)
+    creador_email = models.CharField(max_length=128, null=False, blank=False)
     participantes = ArrayField(models.CharField(max_length=128), blank=True, null=True)
 
     class Meta:
