@@ -54,8 +54,16 @@ def get_mis_rutas():
 
 def get_all_rutas():
 
-    rutas_ref = FIREBASE_DB.collection('rutas')
-    rutas = rutas_ref.get()
+    logged_id = AUTH_DB.current_user["localId"]
+    #logged_id = 'cNtxKjlvPTM6TE6aaTC6mjl1hj12'
+
+    rutas_no_creadas_ref = FIREBASE_DB.collection('rutas').where('creador', '!=', logged_id)
+    rutas_no_creadas = rutas_no_creadas_ref.get()
+
+    rutas_participadas_ref = FIREBASE_DB.collection('rutas').where('participantes', 'array_contains', logged_id)
+    rutas_participadas = rutas_participadas_ref.get()
+
+    rutas = [ruta for ruta in rutas_no_creadas if ruta.id not in [ruta.id for ruta in rutas_participadas]]
 
     # Itera sobre los resultados para obtener los datos de las rutas encontradas
     rutas_encontradas = []
