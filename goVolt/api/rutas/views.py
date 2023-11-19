@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import RutaViaje
-from api.rutas.services import store_ruta,get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, get_routes_participadas, remove_participant
+from api.rutas.services import store_ruta,get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, get_routes_participadas, remove_participant, add_request_participant, remove_request_participant
 import json
 
 # Create your views here.
@@ -82,7 +82,65 @@ class EditarRutaViajeView(APIView):
         else:
             # Si result no es una excepción, es el resultado exitoso
             return Response({'message':'Successful Edit'},status=status.HTTP_200_OK)
-        
+
+class AddRequestParticipantRutaViajeView(APIView):
+    def post(self, request, ruta_id):
+
+        # Get the route instance
+        result = add_request_participant(ruta_id)
+
+        if (result.status_code != 200):
+            # Verificar si result es una excepción
+            code = result.status_code
+
+            if code == 200:
+                st = status.HTTP_200_OK
+            elif code == 400:
+                st = status.HTTP_400_BAD_REQUEST
+            elif code == 401:
+                st = status.HTTP_401_UNAUTHORIZED
+            elif code == 403:
+                st = status.HTTP_403_FORBIDDEN
+            elif code == 404:
+                st = status.HTTP_404_NOT_FOUND
+            elif code == 500:
+                st = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+            return Response({"message": result.data.get('message')}, status=st)
+
+        else:
+            # Si result no es una excepción, es el resultado exitoso
+            return Response({'message':'Successful Edit Request'},status=status.HTTP_200_OK)
+
+class RemoveRequestParticipantRutaViajeView(APIView):
+    def post(self, request, ruta_id, participant_id):
+
+        # Get the route instance
+        result = remove_request_participant(ruta_id, participant_id)
+
+        if (result.status_code != 200):
+            # Verificar si result es una excepción
+            code = result.status_code
+
+            if code == 200:
+                st = status.HTTP_200_OK
+            elif code == 400:
+                st = status.HTTP_400_BAD_REQUEST
+            elif code == 401:
+                st = status.HTTP_401_UNAUTHORIZED
+            elif code == 403:
+                st = status.HTTP_403_FORBIDDEN
+            elif code == 404:
+                st = status.HTTP_404_NOT_FOUND
+            elif code == 500:
+                st = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+            return Response({"message": result.data.get('message')}, status=st)
+
+        else:
+            # Si result no es una excepción, es el resultado exitoso
+            return Response({'message':'Successful Deleted Request'},status=status.HTTP_200_OK)
+
 class AddParticipantRutaViajeView(APIView):
     def post(self, request, ruta_id, participant_id):
 

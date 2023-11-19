@@ -13,3 +13,11 @@ class RutaViaje(models.Model):
 
     class Meta:
         db_table = 'rutas'
+
+class RequestParticipant(models.Model):
+    user_id = models.CharField(max_length=128, null=False, blank=False)
+    ruta_id = models.CharField(max_length=128, null=False, blank=False)
+
+    class Meta:
+        db_table = 'requests_participants'
+        unique_together = ('user_id', 'ruta_id')

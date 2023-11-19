@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import RutaViaje
+from .models import RutaViaje, RequestParticipant
 
 class RutaViajeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,3 +9,8 @@ class RutaViajeSerializer(serializers.ModelSerializer):
             'creador': {'required': False},
             'participantes': {'required': False}
         }
+
+class RequestParticipantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestParticipant
+        fields = ['user_id', 'ruta_id']

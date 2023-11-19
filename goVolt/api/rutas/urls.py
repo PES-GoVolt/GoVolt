@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CrearRutaViajeView, GetMisRutasView, GetAllRutasView, GetRutaByIdView, EditarRutaViajeView, AddParticipantRutaViajeView, GetRutasParticipadasView, RemoveParticipantRutaViajeView
+from .views import CrearRutaViajeView, GetMisRutasView, GetAllRutasView, GetRutaByIdView, EditarRutaViajeView, AddParticipantRutaViajeView, GetRutasParticipadasView, RemoveParticipantRutaViajeView, AddRequestParticipantRutaViajeView, RemoveRequestParticipantRutaViajeView
 
 urlpatterns = [
     # listar todas las rutas
@@ -14,6 +14,10 @@ urlpatterns = [
     path('<str:id>/', GetRutaByIdView.as_view(), name='get-route-by-id'),
     # editar info rutas
     path('edit/<str:id>/', EditarRutaViajeView.as_view(), name='edit-route'),
+    # usuario pide ser participante
+    path('add_request_participant/<str:ruta_id>/', AddRequestParticipantRutaViajeView.as_view(), name='add-request-participant-route'),
+    # creador rechaza participante
+    path('remove_request_participant/<str:ruta_id>/<str:participant_id>/', RemoveRequestParticipantRutaViajeView.as_view(), name='remove-request-participant-route'),
     # añadir participante a ruta
     path('add_participant/<str:ruta_id>/<str:participant_id>/', AddParticipantRutaViajeView.as_view(), name='add-participant-route'),
     # eliminar participante de ruta
