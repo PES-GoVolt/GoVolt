@@ -49,9 +49,9 @@ def get_room_messages(room_name):
 def modify_timestamp_chat(id_chat):
     collection_name = 'chats'
     chat_ref = FIREBASE_DB.collection(collection_name).document(id_chat)
-    chat_info = chat_ref.get()
+    chat_info = chat_ref.get().to_dict()
     chat_info["last_conection"] = get_timestamp_now()
-    chat_ref.update(chat_info)
+    chat_ref.update({"last_conection": chat_info["last_conection"]})
 
 
 def save_chat(userUid,room_name):
