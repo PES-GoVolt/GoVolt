@@ -6,7 +6,7 @@ import json
 from .utils import get_timestamp_now
 from .serializers import MessageSerializer,ChatSerializer 
 from rest_framework import serializers
-
+from google.cloud import firestore
 def save_message(message,room_name,sender):
     ref = db.reference("/")
 
@@ -73,7 +73,7 @@ def get_chats_user_loged():
     collection_name = 'chats'
     logged_uid = AUTH_DB.current_user["localId"]
     chat_ref = FIREBASE_DB.collection(collection_name)
-    query = chat_ref.where('userUid','==',logged_uid).order_by('last_conection')
+    query = chat_ref.where('userUid','==',logged_uid).order_by('last_conection', direction=firestore.Query.DESCENDING)
     docs = query.get()
     chats = []
     for doc in docs:
