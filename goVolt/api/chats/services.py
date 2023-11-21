@@ -108,6 +108,6 @@ def get_chats_user_loged():
         data['id_chat'] = doc.id
         chats.append(data)
 
-    return data
+    return chats
 
    
