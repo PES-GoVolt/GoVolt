@@ -63,16 +63,17 @@ def save_chat(userUid,room_name,uidCreator):
     creator = False
     if(userUid == uidCreator):
         creator = True
-    
+    logged_uid = AUTH_DB.current_user["localId"]
     collection_ref.add({
-         "userUid": userUid,
+         "userUid_sender": userUid,
+         "userUid_reciever": logged_uid,
          "room_name" : room_name,
          "last_conection" : get_timestamp_now(),
          "creator": creator,
          "email":res.get('email')
     })
     
-    logged_uid = AUTH_DB.current_user["localId"]
+    
 
     user_ref2 = FIREBASE_DB.collection('users').document(logged_uid)
     res2 = user_ref2.get()
@@ -81,7 +82,8 @@ def save_chat(userUid,room_name,uidCreator):
         creator = True
     
     collection_ref.add({
-         "userUid": logged_uid,
+         "userUid_sender": logged_uid,
+         "userUid_reciever": userUid,
          "room_name" : room_name,
          "last_conection" : get_timestamp_now(),
          "creator": creator,
@@ -92,20 +94,20 @@ def get_chats_user_loged():
     collection_name = 'chats'
     logged_uid = AUTH_DB.current_user["localId"]
     chat_ref = FIREBASE_DB.collection(collection_name)
-    query = chat_ref.where('userUid','==',logged_uid).order_by('last_conection', direction=firestore.Query.DESCENDING)
+    query = chat_ref.where('userUid_sender','==',logged_uid).order_by('last_conection', direction=firestore.Query.DESCENDING)
     docs = query.get()
     chats = []
     for doc in docs:
         data = doc.to_dict()
         data['room_name'] = data.get('room_name')
         data['last_conection'] = data.get('last_conection')
-        data['idUser'] = data.get('userUid')
+        data['userUid_sender'] = data.get('userUid_sender')
+        data['userUid-reciever'] = data.get('userUid-reciever')
         data['email'] = data.get('email')
         data['creator'] = data.get('creator')
+        data['id_chat'] = doc.id
         chats.append(data)
-    serializer = ChatSerializer(data=chats, many=True)
-    if serializer.is_valid():
-        return serializer.data
-    else:
-        raise serializers.ValidationError(serializer.errors)
+
+    return data
+
    
