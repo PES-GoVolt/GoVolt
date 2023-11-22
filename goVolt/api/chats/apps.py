@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ChargersConfig(AppConfig):
+class ChatsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'api.chargers'
+    name = 'api.chats'
