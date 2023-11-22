@@ -70,7 +70,7 @@ def save_chat(userUid,room_name,uidCreator):
     collection_ref.add({
          "userUid_sender": userUid,
          "userUid_reciever": logged_uid,
-         "room_name" : room_name,
+         "room_name" : room_name+"/"+logged_uid,
          "last_conection" : get_timestamp_now(),
          "creator": creator,
          "email":res2.get('email')
@@ -84,12 +84,13 @@ def save_chat(userUid,room_name,uidCreator):
     collection_ref.add({
          "userUid_sender": logged_uid,
          "userUid_reciever": userUid,
-         "room_name" : room_name,
+         "room_name" : room_name+"/"+logged_uid,
          "last_conection" : get_timestamp_now(),
          "creator": creator,
          "email": res.get('email')
     })
 
+    return room_name+"/"+logged_uid
 def get_chats_user_loged():
     collection_name = 'chats'
     logged_uid = AUTH_DB.current_user["localId"]
