@@ -61,22 +61,22 @@ def save_chat(userUid,room_name,uidCreator):
     user_ref = FIREBASE_DB.collection('users').document(userUid)
     res = user_ref.get()
     creator = False
+    logged_uid = AUTH_DB.current_user["localId"]
+    user_ref2 = FIREBASE_DB.collection('users').document(logged_uid)
+    res2 = user_ref2.get()
     if(userUid == uidCreator):
         creator = True
-    logged_uid = AUTH_DB.current_user["localId"]
+
     collection_ref.add({
          "userUid_sender": userUid,
          "userUid_reciever": logged_uid,
          "room_name" : room_name,
          "last_conection" : get_timestamp_now(),
          "creator": creator,
-         "email":res.get('email')
+         "email":res2.get('email')
     })
     
-    
 
-    user_ref2 = FIREBASE_DB.collection('users').document(logged_uid)
-    res2 = user_ref2.get()
     creator = False
     if(logged_uid == uidCreator):
         creator = True
@@ -87,7 +87,7 @@ def save_chat(userUid,room_name,uidCreator):
          "room_name" : room_name,
          "last_conection" : get_timestamp_now(),
          "creator": creator,
-         "email": res2.get('email')
+         "email": res.get('email')
     })
 
 def get_chats_user_loged():
