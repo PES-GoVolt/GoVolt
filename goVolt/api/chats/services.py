@@ -1,7 +1,7 @@
 from goVolt.settings import FIREBASE_DB,AUTH_DB
 from datetime import datetime
 
-from firebase_admin import db
+from firebase_admin import db,auth
 import json
 from .utils import get_timestamp_now
 from .serializers import MessageSerializer,ChatSerializer 
@@ -54,37 +54,61 @@ def modify_timestamp_chat(id_chat):
     chat_ref.update({"last_conection": chat_info["last_conection"]})
 
 
-def save_chat(userUid,room_name):
+def save_chat(userUid,room_name,uidCreator):
     collection_name = 'chats'
     collection_ref = FIREBASE_DB.collection(collection_name)
+
+    user_ref = FIREBASE_DB.collection('users').document(userUid)
+    res = user_ref.get()
+    creator = False
+    logged_uid = AUTH_DB.current_user["localId"]
+    user_ref2 = FIREBASE_DB.collection('users').document(logged_uid)
+    res2 = user_ref2.get()
+    if(userUid == uidCreator):
+        creator = True
+
     collection_ref.add({
-         "userUid": userUid,
-         "room_name" : room_name,
-         "last_conection" : get_timestamp_now()
+         "userUid_sender": userUid,
+         "userUid_reciever": logged_uid,
+         "room_name" : room_name+"/"+logged_uid,
+         "last_conection" : get_timestamp_now(),
+         "creator": creator,
+         "email":res2.get('email')
     })
     
-    logged_uid = AUTH_DB.current_user["localId"]
+
+    creator = False
+    if(logged_uid == uidCreator):
+        creator = True
+    
     collection_ref.add({
-         "userUid": logged_uid,
-         "room_name" : room_name,
-         "last_conection" : get_timestamp_now()
+         "userUid_sender": logged_uid,
+         "userUid_reciever": userUid,
+         "room_name" : room_name+"/"+logged_uid,
+         "last_conection" : get_timestamp_now(),
+         "creator": creator,
+         "email": res.get('email')
     })
+
+    return room_name+"/"+logged_uid
 def get_chats_user_loged():
     collection_name = 'chats'
     logged_uid = AUTH_DB.current_user["localId"]
     chat_ref = FIREBASE_DB.collection(collection_name)
-    query = chat_ref.where('userUid','==',logged_uid).order_by('last_conection', direction=firestore.Query.DESCENDING)
+    query = chat_ref.where('userUid_sender','==',logged_uid).order_by('last_conection', direction=firestore.Query.DESCENDING)
     docs = query.get()
     chats = []
     for doc in docs:
         data = doc.to_dict()
         data['room_name'] = data.get('room_name')
         data['last_conection'] = data.get('last_conection')
-        data['userUid'] = data.get('userUid')
+        data['userUid_sender'] = data.get('userUid_sender')
+        data['userUid-reciever'] = data.get('userUid-reciever')
+        data['email'] = data.get('email')
+        data['creator'] = data.get('creator')
+        data['id_chat'] = doc.id
         chats.append(data)
-    serializer = ChatSerializer(data=chats, many=True)
-    if serializer.is_valid():
-        return serializer.data
-    else:
-        raise serializers.ValidationError(serializer.errors)
+
+    return chats
+
    

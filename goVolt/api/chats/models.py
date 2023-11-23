@@ -10,6 +10,10 @@ class Message(models.Model):
     room_name = models.CharField(max_length=100)
 
 class Chat(models.Model):
-    idUser = models.CharField(max_length=128, unique=True, null=True, default=None)
+    idUser_sender = models.CharField(max_length=128, unique=False, null=True, default=None)
+    idUser_reciever = models.CharField(max_length=128, unique=False, null=True, default=None)    
     room_name = models.CharField(max_length=100)
     last_conection =  models.IntegerField()
+    email = models.CharField(max_length=100)
+    creator = models.BooleanField()
+    id_chat = models.CharField(max_length=128, unique=True, null=True, default=None)
