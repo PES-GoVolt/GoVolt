@@ -2,8 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import RutaViaje
-from api.rutas.services import store_ruta,get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, get_routes_participadas, remove_participant, add_request_participant, remove_request_participant
+from api.rutas.services import store_ruta, get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, \
+    get_routes_participadas, remove_participant, add_request_participant, remove_request_participant
 import json
+
 
 # Create your views here.
 class CrearRutaViajeView(APIView):
@@ -13,7 +15,7 @@ class CrearRutaViajeView(APIView):
 
         if (result.status_code != 200):
             code = result.status_code
-            
+
             if code == 400:
                 st = status.HTTP_400_BAD_REQUEST
             elif code == 401:
@@ -29,23 +31,27 @@ class CrearRutaViajeView(APIView):
 
         else:
             # Si result no es una excepción, es el resultado exitoso
-            return Response({'message':result.data.get('message')},status=status.HTTP_200_OK)
+            return Response({'message': result.data.get('message')}, status=status.HTTP_200_OK)
+
 
 class GetMisRutasView(APIView):
-    def get(self,request):
-        return Response({'rutas':get_mis_rutas()},status=status.HTTP_200_OK)
+    def get(self, request):
+        return Response({'rutas': get_mis_rutas()}, status=status.HTTP_200_OK)
+
 
 class GetAllRutasView(APIView):
-    def get(self,request):
-        return Response({'rutas':get_all_rutas()},status=status.HTTP_200_OK)
-    
+    def get(self, request):
+        return Response({'rutas': get_all_rutas()}, status=status.HTTP_200_OK)
+
+
 class GetRutaByIdView(APIView):
-    def get(self,request, id):
+    def get(self, request, id):
         ruta = get_ruta_by_id(id)
         if ruta is not None:
             return Response(ruta, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Ruta not found"}, status=status.HTTP_404_NOT_FOUND)
+
 
 class EditarRutaViajeView(APIView):
     def post(self, request, id):
@@ -168,7 +174,8 @@ class AddParticipantRutaViajeView(APIView):
 
         else:
             # Si result no es una excepción, es el resultado exitoso
-            return Response({'message':'Successful Edit'},status=status.HTTP_200_OK)
+            return Response({'message': 'Successful Edit'}, status=status.HTTP_200_OK)
+
 
 class GetRutasParticipadasView(APIView):
     def get(self, request):
@@ -177,6 +184,7 @@ class GetRutasParticipadasView(APIView):
             return Response({"rutas": rutas}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Routes not found"}, status=status.HTTP_404_NOT_FOUND)
+
 
 class RemoveParticipantRutaViajeView(APIView):
     def post(self, request, ruta_id, participant_id):
@@ -203,4 +211,4 @@ class RemoveParticipantRutaViajeView(APIView):
 
         else:
             # Si result no es una excepción, es el resultado exitoso
-            return Response({'message':'Successful Remove Participant'},status=status.HTTP_200_OK)
+            return Response({'message': 'Successful Remove Participant'}, status=status.HTTP_200_OK)

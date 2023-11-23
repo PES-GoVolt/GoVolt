@@ -79,7 +79,6 @@ def store_charge_points_fb(data):
 def delete_all_charge_points_fb():
     collection_ref = FIREBASE_DB.collection('charge_points')
     docs = collection_ref.get()
-
     for doc in docs:
         doc.reference.delete()
 
