@@ -6,7 +6,7 @@ from .services import save_message,get_room_messages,modify_timestamp_chat,save_
 from rest_framework.response import Response
 
 from rest_framework.permissions import IsAuthenticated
-from api.users.autentication import FirebaseAuthentication
+from api.users.authentication import FirebaseAuthentication
 
 class MessagesAPIView(APIView):
 
@@ -31,6 +31,7 @@ class ChatsAPIView(APIView):
 
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
+
     def put(self,request):
         id_chat = request.data['id_chat']
         modify_timestamp_chat(id_chat)

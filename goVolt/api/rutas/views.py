@@ -7,7 +7,7 @@ from api.rutas.services import store_ruta, get_mis_rutas, get_all_rutas, get_rut
 import json
 
 from rest_framework.permissions import IsAuthenticated
-from api.users.autentication import FirebaseAuthentication
+from api.users.authentication import FirebaseAuthentication
 
 # Create your views here.
 class CrearRutaViajeView(APIView):

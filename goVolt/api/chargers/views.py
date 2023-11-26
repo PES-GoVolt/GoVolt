@@ -6,7 +6,7 @@ from rest_framework import status
 from api.chargers.services import get_all_chargers,read_data,store_charge_points_fb,get_charger_by_id
 from api.chargers.utils import nearest_point
 from rest_framework.permissions import IsAuthenticated
-from api.users.autentication import FirebaseAuthentication
+from api.users.authentication import FirebaseAuthentication
 
 
 class ChargerLocationApiView(APIView):
