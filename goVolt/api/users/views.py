@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import json
 from rest_framework.views import APIView
@@ -13,40 +14,31 @@ from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from api.users.services import get_auth_user, store_user, get_see_my_profile, edit_user, logout
+from api.users.services import get_auth_user, store_user, get_see_my_profile, edit_user, logout,authenticate_with_fb
 
 class LoginApiView(APIView):
     @csrf_exempt
+
     def post(self, request):
+        auth_header = request.META.get("HTTP_AUTHORIZATION")
+        if auth_header and auth_header.startswith('Bearer '):
+            id_token = auth_header.split(" ").pop()
+            decoded_token = None
+            try:
+                decoded_token = authenticate_with_fb(id_token)
+                #return Response({'message':'User logged in'},status=status.HTTP_200_OK)
+            except auth.ExpiredIdTokenError:
+                #return Response({'message':'Expired token'},status=status.HTTP_401_UNAUTHORIZED)
+                pass
+            except auth.InvalidIdTokenError:
+                #return Response({'message':f'User not found {id_token}'},status=status.HTTP_404_NOT_FOUND)
+                pass
+            
 
-        # Recuperamos las credenciales y autenticamos al usuario
-        email = request.data.get('email', None)
-        password = request.data.get('password', None)
 
-        if email is None or password is None:
-            return Response({'message': 'It is necessary to enter Email and Password'},status=status.HTTP_400_BAD_REQUEST)
-
-        result = get_auth_user(email, password)
-
-        if (result.status_code != 200):
-            code = result.status_code
-
-            if code == 400:
-                st = status.HTTP_400_BAD_REQUEST
-            elif code == 401:
-                st = status.HTTP_401_UNAUTHORIZED
-            elif code == 403:
-                st = status.HTTP_403_FORBIDDEN
-            elif code == 404:
-                st = status.HTTP_404_NOT_FOUND
-            elif code == 500:
-                st = status.HTTP_500_INTERNAL_SERVER_ERROR
-
-            return Response({"message": result.data.get('message')}, status=st)
-
+            return Response({'message':'User logged in'},status=status.HTTP_200_OK)
         else:
-            # Si result no es una excepción, es el resultado exitoso
-            return Response({'message':'Successful Authentication'},status=status.HTTP_200_OK)
+            return Response({'message':'id_token is required for autentication'},status=status.HTTP_400_BAD_REQUEST )
 
 class LogOutApiView(APIView):
     @csrf_exempt

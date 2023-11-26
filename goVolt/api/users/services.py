@@ -26,6 +26,12 @@ def logout(request):
         return Response({'message': msg}, status=code)
 
 
+def authenticate_with_fb(id_token):
+    decoded_token = None
+    decoded_token = auth.verify_id_token(id_token)
+    return decoded_token
+
+
 def get_auth_user(email, password):
     try:
         AUTH_DB.sign_in_with_email_and_password(email, password)
