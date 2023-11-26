@@ -45,9 +45,7 @@ class ChatsAPIView(APIView):
 
     def get(self,request):
         firebase_token = request.headers.get("Authorization", "").split(" ")[1]
-        decoded_token = auth.verify_id_token(firebase_token)
-        uid = decoded_token['uid']
-        chats = get_chats_user_loged(uid)
+        chats = get_chats_user_loged(firebase_token)
         return Response({'chats':chats},status=status.HTTP_200_OK)
 
 
