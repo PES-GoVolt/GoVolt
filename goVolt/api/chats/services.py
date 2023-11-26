@@ -91,9 +91,11 @@ def save_chat(userUid,room_name,uidCreator,logged_uid):
     })
 
     return room_name+"/"+logged_uid
-def get_chats_user_loged(logged_uid):
+def get_chats_user_loged(firebase_token):
     collection_name = 'chats'
     #logged_uid = AUTH_DB.current_user["localId"]
+    decoded_token = auth.verify_id_token(firebase_token)
+    logged_uid = decoded_token['uid']
     chat_ref = FIREBASE_DB.collection(collection_name)
     warnings.filterwarnings("ignore", category=UserWarning, module="google.cloud.firestore_v1.base_collection")
     query = chat_ref.where('userUid_sender', '==', logged_uid).order_by('last_conection', direction=firestore.Query.DESCENDING)
