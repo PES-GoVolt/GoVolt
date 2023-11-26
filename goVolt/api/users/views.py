@@ -108,13 +108,17 @@ class SeeMyProfileApiView(APIView):
 
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
+    
     def get(self, request):
-        return Response(get_see_my_profile(), status=status.HTTP_200_OK)
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+
+        return Response(get_see_my_profile(firebase_token), status=status.HTTP_200_OK)
     
 class EditMyProfileApiView(APIView):
 
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
+
     def post(self, request):
 
         data = json.loads(request.body)
@@ -124,7 +128,9 @@ class EditMyProfileApiView(APIView):
         phone = data.get('phone')
         photo_url = data.get('photo_url')
 
-        result = edit_user(first_name, last_name, phone, photo_url)
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+
+        result = edit_user(firebase_token, first_name, last_name, phone, photo_url)
 
         if isinstance(result, Exception):
             # Verificar si result es una excepción
