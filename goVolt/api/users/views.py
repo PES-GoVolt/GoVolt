@@ -15,6 +15,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from api.users.services import get_auth_user, store_user, get_see_my_profile, edit_user, logout,authenticate_with_fb
+from rest_framework.permissions import IsAuthenticated
+from api.users.autentication import FirebaseAuthentication
 
 class LoginApiView(APIView):
     @csrf_exempt
@@ -103,11 +105,16 @@ class RegisterApiView(APIView):
             return Response({'message':'Successful Registration'},status=status.HTTP_200_OK)
 
 class SeeMyProfileApiView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def get(self, request):
         return Response(get_see_my_profile(), status=status.HTTP_200_OK)
     
 class EditMyProfileApiView(APIView):
-    @csrf_exempt
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def post(self, request):
 
         data = json.loads(request.body)

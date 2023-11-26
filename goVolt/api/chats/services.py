@@ -1,6 +1,6 @@
 from goVolt.settings import FIREBASE_DB,AUTH_DB
 from datetime import datetime
-
+import warnings
 from firebase_admin import db,auth
 import json
 from .utils import get_timestamp_now
@@ -54,14 +54,14 @@ def modify_timestamp_chat(id_chat):
     chat_ref.update({"last_conection": chat_info["last_conection"]})
 
 
-def save_chat(userUid,room_name,uidCreator):
+def save_chat(userUid,room_name,uidCreator,logged_uid):
     collection_name = 'chats'
     collection_ref = FIREBASE_DB.collection(collection_name)
 
     user_ref = FIREBASE_DB.collection('users').document(userUid)
     res = user_ref.get()
     creator = False
-    logged_uid = AUTH_DB.current_user["localId"]
+    #logged_uid =  AUTH_DB.current_user["localId"]
     user_ref2 = FIREBASE_DB.collection('users').document(logged_uid)
     res2 = user_ref2.get()
     if(userUid == uidCreator):
@@ -91,11 +91,12 @@ def save_chat(userUid,room_name,uidCreator):
     })
 
     return room_name+"/"+logged_uid
-def get_chats_user_loged():
+def get_chats_user_loged(logged_uid):
     collection_name = 'chats'
-    logged_uid = AUTH_DB.current_user["localId"]
+    #logged_uid = AUTH_DB.current_user["localId"]
     chat_ref = FIREBASE_DB.collection(collection_name)
-    query = chat_ref.where('userUid_sender','==',logged_uid).order_by('last_conection', direction=firestore.Query.DESCENDING)
+    warnings.filterwarnings("ignore", category=UserWarning, module="google.cloud.firestore_v1.base_collection")
+    query = chat_ref.where('userUid_sender', '==', logged_uid).order_by('last_conection', direction=firestore.Query.DESCENDING)
     docs = query.get()
     chats = []
     for doc in docs:

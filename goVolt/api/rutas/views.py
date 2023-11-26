@@ -6,9 +6,14 @@ from api.rutas.services import store_ruta, get_mis_rutas, get_all_rutas, get_rut
     get_routes_participadas, remove_participant, add_request_participant, remove_request_participant
 import json
 
+from rest_framework.permissions import IsAuthenticated
+from api.users.autentication import FirebaseAuthentication
 
 # Create your views here.
 class CrearRutaViajeView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def post(self, request, *args, **kwargs):
 
         result = store_ruta(request.data)
@@ -35,16 +40,25 @@ class CrearRutaViajeView(APIView):
 
 
 class GetMisRutasView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def get(self, request):
         return Response({'rutas': get_mis_rutas()}, status=status.HTTP_200_OK)
 
 
 class GetAllRutasView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def get(self, request):
         return Response({'rutas': get_all_rutas()}, status=status.HTTP_200_OK)
 
 
 class GetRutaByIdView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def get(self, request, id):
         ruta = get_ruta_by_id(id)
         if ruta is not None:
@@ -54,6 +68,9 @@ class GetRutaByIdView(APIView):
 
 
 class EditarRutaViajeView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def post(self, request, id):
         data = json.loads(request.body)
 
@@ -90,6 +107,9 @@ class EditarRutaViajeView(APIView):
             return Response({'message':'Successful Edit'},status=status.HTTP_200_OK)
 
 class AddRequestParticipantRutaViajeView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def post(self, request, ruta_id):
 
         # Get the route instance
@@ -119,6 +139,9 @@ class AddRequestParticipantRutaViajeView(APIView):
             return Response({'message':'Successful Edit Request'},status=status.HTTP_200_OK)
 
 class RemoveRequestParticipantRutaViajeView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def post(self, request, ruta_id, participant_id):
 
         # Get the route instance
@@ -148,6 +171,9 @@ class RemoveRequestParticipantRutaViajeView(APIView):
             return Response({'message':'Successful Deleted Request'},status=status.HTTP_200_OK)
 
 class AddParticipantRutaViajeView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def post(self, request, ruta_id, participant_id):
 
         # Get the route instance
@@ -178,6 +204,9 @@ class AddParticipantRutaViajeView(APIView):
 
 
 class GetRutasParticipadasView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def get(self, request):
         rutas = get_routes_participadas()
         if rutas is not None:
@@ -187,6 +216,9 @@ class GetRutasParticipadasView(APIView):
 
 
 class RemoveParticipantRutaViajeView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
     def post(self, request, ruta_id, participant_id):
 
         # Get the route instance
