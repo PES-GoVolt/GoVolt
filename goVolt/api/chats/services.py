@@ -61,7 +61,7 @@ def save_chat(userUid,room_name,uidCreator,logged_uid):
     user_ref = FIREBASE_DB.collection('users').document(userUid)
     res = user_ref.get()
     creator = False
-    #logged_uid =  AUTH_DB.current_user["localId"]
+
     user_ref2 = FIREBASE_DB.collection('users').document(logged_uid)
     res2 = user_ref2.get()
     if(userUid == uidCreator):
@@ -93,7 +93,7 @@ def save_chat(userUid,room_name,uidCreator,logged_uid):
     return room_name+"/"+logged_uid
 def get_chats_user_loged(firebase_token):
     collection_name = 'chats'
-    #logged_uid = AUTH_DB.current_user["localId"]
+
     decoded_token = auth.verify_id_token(firebase_token)
     logged_uid = decoded_token['uid']
     chat_ref = FIREBASE_DB.collection(collection_name)

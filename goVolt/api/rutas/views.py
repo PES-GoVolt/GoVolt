@@ -14,9 +14,12 @@ class CrearRutaViajeView(APIView):
 
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
+
     def post(self, request, *args, **kwargs):
 
-        result = store_ruta(request.data)
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+
+        result = store_ruta(firebase_token, request.data)
 
         if (result.status_code != 200):
             code = result.status_code
@@ -43,8 +46,11 @@ class GetMisRutasView(APIView):
 
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
+
     def get(self, request):
-        return Response({'rutas': get_mis_rutas()}, status=status.HTTP_200_OK)
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+
+        return Response({'rutas': get_mis_rutas(firebase_token)}, status=status.HTTP_200_OK)
 
 
 class GetAllRutasView(APIView):
@@ -52,7 +58,9 @@ class GetAllRutasView(APIView):
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
     def get(self, request):
-        return Response({'rutas': get_all_rutas()}, status=status.HTTP_200_OK)
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+
+        return Response({'rutas': get_all_rutas(firebase_token)}, status=status.HTTP_200_OK)
 
 
 class GetRutaByIdView(APIView):
@@ -60,7 +68,9 @@ class GetRutaByIdView(APIView):
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
     def get(self, request, id):
-        ruta = get_ruta_by_id(id)
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+
+        ruta = get_ruta_by_id(firebase_token, id)
         if ruta is not None:
             return Response(ruta, status=status.HTTP_200_OK)
         else:
@@ -72,6 +82,8 @@ class EditarRutaViajeView(APIView):
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
     def post(self, request, id):
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+
         data = json.loads(request.body)
 
         ubicacion_inicial = data.get('ubicacion_inicial')
@@ -81,7 +93,7 @@ class EditarRutaViajeView(APIView):
         fecha = data.get('fecha')
         creador = data.get('creador')
 
-        result = edit_ruta(id, ubicacion_inicial, ubicacion_final, precio, num_plazas, fecha, creador)
+        result = edit_ruta(firebase_token, id, ubicacion_inicial, ubicacion_final, precio, num_plazas, fecha, creador)
 
         if (result.status_code != 200):
             # Verificar si result es una excepción
@@ -113,7 +125,9 @@ class AddRequestParticipantRutaViajeView(APIView):
     def post(self, request, ruta_id):
 
         # Get the route instance
-        result = add_request_participant(ruta_id)
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+
+        result = add_request_participant(firebase_token, ruta_id)
 
         if (result.status_code != 200):
             # Verificar si result es una excepción
@@ -144,8 +158,9 @@ class RemoveRequestParticipantRutaViajeView(APIView):
     authentication_classes = [ FirebaseAuthentication ]
     def post(self, request, ruta_id, participant_id):
 
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
         # Get the route instance
-        result = remove_request_participant(ruta_id, participant_id)
+        result = remove_request_participant(firebase_token, ruta_id, participant_id)
 
         if (result.status_code != 200):
             # Verificar si result es una excepción
@@ -176,8 +191,9 @@ class AddParticipantRutaViajeView(APIView):
     authentication_classes = [ FirebaseAuthentication ]
     def post(self, request, ruta_id, participant_id):
 
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
         # Get the route instance
-        result = add_participant(ruta_id, participant_id)
+        result = add_participant(firebase_token, ruta_id, participant_id)
 
         if (result.status_code != 200):
             # Verificar si result es una excepción
@@ -208,7 +224,9 @@ class GetRutasParticipadasView(APIView):
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
     def get(self, request):
-        rutas = get_routes_participadas()
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+
+        rutas = get_routes_participadas(firebase_token)
         if rutas is not None:
             return Response({"rutas": rutas}, status=status.HTTP_200_OK)
         else:
@@ -221,8 +239,9 @@ class RemoveParticipantRutaViajeView(APIView):
     authentication_classes = [ FirebaseAuthentication ]
     def post(self, request, ruta_id, participant_id):
 
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
         # Get the route instance
-        result = remove_participant(ruta_id, participant_id)
+        result = remove_participant(firebase_token, ruta_id, participant_id)
 
         if (result.status_code != 200):
             # Verificar si result es una excepción
