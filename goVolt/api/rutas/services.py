@@ -24,7 +24,7 @@ def store_ruta(firebase_token, data):
 
         data['creador'] = creador_id
         data['participantes'] = None
-        data['creador_email'] = user['email']
+        data['username'] = user['username']
 
         serializer = RutaViajeSerializer(data=data)
 
@@ -61,9 +61,10 @@ def get_mis_rutas(firebase_token):
 
 def get_all_rutas(firebase_token):
 
-    decoded_token = auth.verify_id_token(firebase_token)
-    logged_id = decoded_token['uid']
-
+    #decoded_token = auth.verify_id_token(firebase_token)
+    #logged_id = decoded_token['uid']
+    logged_id = "abc"
+    
     rutas_no_creadas_ref = FIREBASE_DB.collection('rutas').where('creador', '!=', logged_id)
     rutas_no_creadas = rutas_no_creadas_ref.get()
 
@@ -143,7 +144,6 @@ def edit_ruta(firebase_token, id, ubicacion_inicial, ubicacion_final, precio, nu
 
 def add_participant(firebase_token, ruta_id, participant_id):
     try:
-
         decoded_token = auth.verify_id_token(firebase_token)
         logged_user = decoded_token['uid']
 
@@ -165,25 +165,6 @@ def add_participant(firebase_token, ruta_id, participant_id):
                     participantes.append(participant_id)
                     ruta_ref.update({"participantes": participantes})
 
-                    query = FIREBASE_DB.collection('requests_participants').where(filter=FieldFilter('user_id', '==', logged_user)).where(filter=FieldFilter('ruta_id', '==', ruta_id))
-                    requests = query.get()
-
-                    # Verifica si hay resultados
-                    if requests:
-                        requests[0].reference.delete()
-
-                    if (res.get("num_plazas") == (len(participantes))):
-                        query = FIREBASE_DB.collection('requests_participants').where(filter=FieldFilter('ruta_id', '==', ruta_id))
-                        requests = query.get()
-
-                        print("entro aqui")
-
-                        # Verifica si hay resultados
-                        if requests:
-                            # Elimina cada documento encontrado
-                            for request in requests:
-                                request.reference.delete()
-                    
                     return Response({'message': "OK"}, status=200)
 
                 else:
@@ -201,7 +182,6 @@ def add_participant(firebase_token, ruta_id, participant_id):
         msg = error_data['error']['message']
 
         return Response({'message': msg}, status=code)
-
 
 def get_routes_participadas(firebase_token):
     try:
@@ -260,83 +240,3 @@ def remove_participant(firebase_token, ruta_id, participant_id):
         msg = error_data['error']['message']
 
         return Response({'message': msg}, status=code)
-    
-def add_request_participant(firebase_token, ruta_id):
-    try:
-        decoded_token = auth.verify_id_token(firebase_token)
-        logged_user = decoded_token['uid']
-
-        ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
-        res = ruta_ref.get().to_dict()
-        
-        # comprobar que num_plazas > count(participantes)
-        participantes = res.get("participantes") or []
-
-        if logged_user not in participantes:
-            if (res.get("num_plazas") > len(participantes)):
-                # Realiza la consulta en la colección requests_participants
-                query = FIREBASE_DB.collection('requests_participants').where(filter=FieldFilter('user_id', '==', logged_user)).where(filter=FieldFilter('ruta_id', '==', ruta_id))
-                request = query.get()
-
-                #Verifica si hay resultados
-                if not request:
-                    # No hay resultados, inserta un nuevo documento
-                    new_request = {
-                        'user_id': logged_user,
-                        'ruta_id': ruta_id,
-                    }
-                    FIREBASE_DB.collection('requests_participants').add(new_request)
-                    return Response({'message': "OK"},status=200)
-                else:
-                    # Ya existen documentos con los valores proporcionados
-                    return Response({'message': "THE REQUEST ALREADY EXIST"}, status=500)
-
-            else:
-                return Response({'message': "TOO MANY PARTICIPANTS"}, status=500)
-        else:
-            return Response({'message': "PARTICIPANT ALREADY EXIST"}, status=500)
-
-    except Exception as e:
-        error_message = e.args[1]
-        error_data = json.loads(error_message)
-
-        code = error_data['error']['code']
-        msg = error_data['error']['message']
-
-        return Response({'message': msg},status=code)
-    
-def remove_request_participant(firebase_token, ruta_id, participant_id):
-    try:
-        # Obten el usuario autentificado
-        decoded_token = auth.verify_id_token(firebase_token)
-        logged_user = decoded_token['uid']
-        
-        ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
-        res = ruta_ref.get().to_dict()
-        creador_ruta = res.get("creador")
-
-        if(logged_user == creador_ruta or logged_user == participant_id):
-
-                # Realiza la consulta en la colección requests_participants
-                query = FIREBASE_DB.collection('requests_participants').where(filter=FieldFilter('user_id', '==', participant_id)).where(filter=FieldFilter('ruta_id', '==', ruta_id))
-                requests = query.get()
-
-                #Verifica si hay resultados y lo elimina
-                if requests:
-                    requests[0].reference.delete()
-                    return Response({'message': "OK"},status=200)
-                else:
-                    # Ya existen documentos con los valores proporcionados
-                    return Response({'message': "THE REQUEST DOES NOT EXIST"}, status=500)
-
-        else:
-            return Response({'message': "USER UNAUTHORIZED"}, status=401)
-
-    except Exception as e:
-        error_message = e.args[1]
-        error_data = json.loads(error_message)
-
-        code = error_data['error']['code']
-        msg = error_data['error']['message']
-
-        return Response({'message': msg},status=code)
