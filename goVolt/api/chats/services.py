@@ -49,14 +49,17 @@ def get_room_messages(room_name):
 def modify_timestamp_chat(id_chat):
     collection_name = 'chats'
     chat_ref = FIREBASE_DB.collection(collection_name).document(id_chat)
-    chat_info = chat_ref.get().to_dict()
+    chat_info = chat_ref.get().to_dict(),
     chat_info["last_conection"] = get_timestamp_now()
     chat_ref.update({"last_conection": chat_info["last_conection"]})
 
 
-def save_chat(userUid,room_name,uidCreator,logged_uid):
+def save_chat(userUid,room_name,uidCreator, firebase_token):
     collection_name = 'chats'
     collection_ref = FIREBASE_DB.collection(collection_name)
+
+    decoded_token = auth.verify_id_token(firebase_token)
+    logged_uid = decoded_token['uid']
 
     user_ref = FIREBASE_DB.collection('users').document(userUid)
     res = user_ref.get()

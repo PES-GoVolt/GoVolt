@@ -41,7 +41,8 @@ class ChatsAPIView(APIView):
         uid = request.data['user_uid']
         room_name = request.data['room_name']
         creator_uid = request.data['creator_uid']
-        room_name = save_chat(uid,room_name,creator_uid)
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+        room_name = save_chat(uid,room_name,creator_uid,firebase_token)
         return Response({'message' : 'Chat created ', "room_name" : room_name},status=status.HTTP_201_CREATED)
 
     def get(self,request):
