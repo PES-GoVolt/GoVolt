@@ -14,6 +14,7 @@ class AllRoutesView(APIView):
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
 
+    # devuelvo todas las rutas - que no he creado yo ni soy participante
     def get(self, request):
         firebase_token = request.headers.get("Authorization", "").split(" ")[1]
         return Response({'rutas': get_all_rutas(firebase_token)}, status=status.HTTP_200_OK)
@@ -22,7 +23,6 @@ class AllRoutesView(APIView):
 
             firebase_token = request.headers.get("Authorization", "").split(" ")[1]
             
-            print("post de ruta")
             result = store_ruta(firebase_token, request.data)
 
             if (result.status_code != 200):
