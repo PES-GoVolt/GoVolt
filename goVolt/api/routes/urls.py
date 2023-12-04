@@ -8,9 +8,11 @@ urlpatterns = [
     # gestión rutas en las que soy participante
     path('/my_current_routes', ParticipantView.as_view(), name='my-current-routes'),
 
+    # gestión de las rutas creadas por mi
+    path('/my_routes', MyRoutesView.as_view(), name='my-routes'),
+    
     # gestión ruta especifica a partir del id
     path('/<str:id>', RouteByIdView.as_view(), name='route-by-id'),
 
-    # gestión de las rutas creadas por mi
-    path('/my_routes', MyRoutesView.as_view(), name='my-routes'),
+    
 ]

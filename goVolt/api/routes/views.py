@@ -21,7 +21,8 @@ class AllRoutesView(APIView):
     def post(self, request):
 
             firebase_token = request.headers.get("Authorization", "").split(" ")[1]
-
+            
+            print("post de ruta")
             result = store_ruta(firebase_token, request.data)
 
             if (result.status_code != 200):

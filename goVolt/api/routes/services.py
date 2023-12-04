@@ -19,6 +19,9 @@ def store_ruta(firebase_token, data):
         decoded_token = auth.verify_id_token(firebase_token)
         creador_id = decoded_token['uid']
 
+        print("creador")
+        print(creador_id)
+
         users_ref = FIREBASE_DB.collection('users')
         user = users_ref.where('firebase_uid', '==', creador_id).get()[0].to_dict()
 
@@ -42,12 +45,18 @@ def store_ruta(firebase_token, data):
 
 def get_mis_rutas(firebase_token):
 
+    print("get mis rutas")
+
     decoded_token = auth.verify_id_token(firebase_token)
     creador_id = decoded_token['uid']
+
+    print("Creador")
+    print(creador_id)
 
     rutas_ref = FIREBASE_DB.collection('rutas')
     rutas = rutas_ref.where('creador', '==', creador_id).get()
 
+    print(rutas)
     # Itera sobre los resultados para obtener los datos de las rutas encontradas
     rutas_encontradas = []
     for resultado in rutas:
@@ -61,9 +70,9 @@ def get_mis_rutas(firebase_token):
 
 def get_all_rutas(firebase_token):
 
-    #decoded_token = auth.verify_id_token(firebase_token)
-    #logged_id = decoded_token['uid']
-    logged_id = "abc"
+    decoded_token = auth.verify_id_token(firebase_token)
+    logged_id = decoded_token['uid']
+    #logged_id = "abc"
     
     rutas_no_creadas_ref = FIREBASE_DB.collection('rutas').where('creador', '!=', logged_id)
     rutas_no_creadas = rutas_no_creadas_ref.get()
