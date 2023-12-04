@@ -10,9 +10,7 @@ from api.users.authentication import FirebaseAuthentication
 
 
 class ChargerLocationApiView(APIView):
-        
-    permission_classes = [ IsAuthenticated ]
-    authentication_classes = [ FirebaseAuthentication ]
+
     def get(self,request):
         response_data = get_all_chargers()
         return Response(response_data,status=status.HTTP_200_OK)
