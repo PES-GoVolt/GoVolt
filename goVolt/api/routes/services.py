@@ -13,17 +13,18 @@ from api.users.models import CustomUser
 
 from google.cloud.firestore_v1.base_query import FieldFilter
 
-def store_ruta(data):
+def store_ruta(firebase_token, data):
     try:
 
-        creador_id = AUTH_DB.current_user["localId"]
-        
+        decoded_token = auth.verify_id_token(firebase_token)
+        creador_id = decoded_token['uid']
+
         users_ref = FIREBASE_DB.collection('users')
         user = users_ref.where('firebase_uid', '==', creador_id).get()[0].to_dict()
 
         data['creador'] = creador_id
         data['participantes'] = None
-        data['creador_email'] = user['email']
+        data['username'] = user['username']
 
         serializer = RutaViajeSerializer(data=data)
 
@@ -39,8 +40,10 @@ def store_ruta(data):
         return Response({'message': str(e)}, status=400)
 
 
-def get_mis_rutas():
-    creador_id = AUTH_DB.current_user["localId"]
+def get_mis_rutas(firebase_token):
+
+    decoded_token = auth.verify_id_token(firebase_token)
+    creador_id = decoded_token['uid']
 
     rutas_ref = FIREBASE_DB.collection('rutas')
     rutas = rutas_ref.where('creador', '==', creador_id).get()
@@ -56,10 +59,12 @@ def get_mis_rutas():
     return rutas_encontradas
 
 
-def get_all_rutas():
-    logged_id = AUTH_DB.current_user["localId"]
-    #logged_id = 'cNtxKjlvPTM6TE6aaTC6mjl1hj13'
+def get_all_rutas(firebase_token):
 
+    decoded_token = auth.verify_id_token(firebase_token)
+    logged_id = decoded_token['uid']
+    #logged_id = "abc"
+    
     rutas_no_creadas_ref = FIREBASE_DB.collection('rutas').where('creador', '!=', logged_id)
     rutas_no_creadas = rutas_no_creadas_ref.get()
 
@@ -79,7 +84,10 @@ def get_all_rutas():
     return rutas_encontradas
 
 
-def get_ruta_by_id(id):
+def get_ruta_by_id(firebase_token, id):
+    decoded_token = auth.verify_id_token(firebase_token)
+    logged_id = decoded_token['uid']
+    
     doc_ref = FIREBASE_DB.collection('rutas').document(id)
 
     res = doc_ref.get()
@@ -102,11 +110,11 @@ def get_ruta_by_id(id):
         raise serializers.ValidationError(serializer.errors)
 
 
-def edit_ruta(id, ubicacion_inicial, ubicacion_final, precio, num_plazas, fecha, creador):
+def edit_ruta(firebase_token, id, ubicacion_inicial, ubicacion_final, precio, num_plazas, fecha, creador):
     try:
-
-        # Obten el usuario autentificado
-        firebase_uid = AUTH_DB.current_user["localId"]
+        
+        decoded_token = auth.verify_id_token(firebase_token)
+        firebase_uid = decoded_token['uid']
 
         ruta_ref = FIREBASE_DB.collection('rutas').document(id)
 
@@ -134,11 +142,10 @@ def edit_ruta(id, ubicacion_inicial, ubicacion_final, precio, num_plazas, fecha,
         return Response({'message': msg}, status=code)
 
 
-def add_participant(ruta_id, participant_id):
+def add_participant(firebase_token, ruta_id, participant_id):
     try:
-
-        # Obten el usuario autentificado
-        logged_user = AUTH_DB.current_user["localId"]
+        decoded_token = auth.verify_id_token(firebase_token)
+        logged_user = decoded_token['uid']
 
         ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
         res = ruta_ref.get().to_dict()
@@ -165,18 +172,17 @@ def add_participant(ruta_id, participant_id):
                     if requests:
                         requests[0].reference.delete()
 
+                    # si ya estan todas las plazas llenas
                     if (res.get("num_plazas") == (len(participantes))):
                         query = FIREBASE_DB.collection('requests_participants').where(filter=FieldFilter('ruta_id', '==', ruta_id))
                         requests = query.get()
 
-                        print("entro aqui")
-
-                        # Verifica si hay resultados
+                        # Verifica si hay request existentes
                         if requests:
-                            # Elimina cada documento encontrado
+                            # Elimina cada request encontrada
                             for request in requests:
                                 request.reference.delete()
-                    
+
                     return Response({'message': "OK"}, status=200)
 
                 else:
@@ -195,11 +201,11 @@ def add_participant(ruta_id, participant_id):
 
         return Response({'message': msg}, status=code)
 
-
-def get_routes_participadas():
+def get_routes_participadas(firebase_token):
     try:
-        participant_id = AUTH_DB.current_user["localId"]
-        #participant_id = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+        decoded_token = auth.verify_id_token(firebase_token)
+        participant_id = decoded_token['uid']
+
         # Query Firestore for routes where the participant is in the participantes array
         routes_ref = FIREBASE_DB.collection('rutas')
         query = routes_ref.where('participantes', 'array_contains', participant_id)
@@ -217,12 +223,11 @@ def get_routes_participadas():
         print(str(e))
         return []
 
-def remove_participant(ruta_id, participant_id):
+def remove_participant(firebase_token, ruta_id, participant_id):
     try:
 
-        # Obten el usuario autentificado
-        logged_user = AUTH_DB.current_user["localId"]
-        #logged_user = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+        decoded_token = auth.verify_id_token(firebase_token)
+        logged_user = decoded_token['uid']
 
         ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
         res = ruta_ref.get()
@@ -253,12 +258,11 @@ def remove_participant(ruta_id, participant_id):
         msg = error_data['error']['message']
 
         return Response({'message': msg}, status=code)
-    
-def add_request_participant(ruta_id):
+
+def add_request_participant(firebase_token, ruta_id):
     try:
-        # Obten el usuario autentificado
-        logged_user = AUTH_DB.current_user["localId"]
-        #logged_user = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+        decoded_token = auth.verify_id_token(firebase_token)
+        logged_user = decoded_token['uid']
 
         ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
         res = ruta_ref.get().to_dict()
@@ -298,12 +302,11 @@ def add_request_participant(ruta_id):
         msg = error_data['error']['message']
 
         return Response({'message': msg},status=code)
-    
-def remove_request_participant(ruta_id, participant_id):
+
+def remove_request_participant(firebase_token, ruta_id, participant_id):
     try:
-        # Obten el usuario autentificado
-        logged_user = AUTH_DB.current_user["localId"]
-        #logged_user = "cNtxKjlvPTM6TE6aaTC6mjl1hj12"
+        decoded_token = auth.verify_id_token(firebase_token)
+        logged_user = decoded_token['uid']
         
         ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
         res = ruta_ref.get().to_dict()

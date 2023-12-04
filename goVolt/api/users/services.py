@@ -11,45 +11,11 @@ import json
 from rest_framework.response import Response
 
 
-def logout(request):
-    try:
-        AUTH_DB.current_user = None
-
-        return Response({'message': "OK"}, status=200)
-    except Exception as e:
-        error_message = e.args[1]
-        error_data = json.loads(error_message)
-
-        code = error_data['error']['code']
-        msg = error_data['error']['message']
-
-        return Response({'message': msg}, status=code)
-
-
-def get_auth_user(email, password):
-    try:
-        AUTH_DB.sign_in_with_email_and_password(email, password)
-
-        # user = FIREBASE_DB.collection('users').document(firebase_uid).get()
-        return Response({'message': "OK"}, status=200)
-    except Exception as e:
-        error_message = e.args[1]
-        error_data = json.loads(error_message)
-
-        code = error_data['error']['code']
-        msg = error_data['error']['message']
-
-        return Response({'message': msg}, status=code)
-
-
-def store_user(email, password, phone):
+def store_user(firebase_token, email, phone, username):
     # Crea una cuenta de usuario en Firebase Authentication
     try:
-        user = auth.create_user(
-            email=email,
-            password=password,
-            phone_number=phone,
-        )
+        decoded_token = auth.verify_id_token(firebase_token)
+        firebase_uid = decoded_token['uid']
 
         # insertar usuarios en la bbdd
         collection_name = 'users'
@@ -59,12 +25,13 @@ def store_user(email, password, phone):
             'photo_url': None,
             'phone': phone,
             'email': email,
-            'firebase_uid': user.uid
+            'username': username,
+            'firebase_uid': firebase_uid
         }
 
         collection_ref = FIREBASE_DB.collection(collection_name)
         # Crea un documento con el ID del usuario (UID) y almacena los datos
-        collection_ref.document(user.uid).set(user_data)
+        collection_ref.document(firebase_uid).set(user_data)
 
         # user = FIREBASE_DB.collection('users').document(firebase_uid).get()
         return Response({'message': "OK"}, status=200)
@@ -73,15 +40,17 @@ def store_user(email, password, phone):
         return Response({'message': str(e)}, status=400)
 
 
-def get_see_my_profile():
+def get_see_my_profile(firebase_token):
     # Obten el token de autenticación de la solicitud
-    print(AUTH_DB.current_user)
-    firebase_uid = AUTH_DB.current_user["localId"]
 
+    decoded_token = auth.verify_id_token(firebase_token)
+    firebase_uid = decoded_token['uid']
+    
     user_ref = FIREBASE_DB.collection('users').document(firebase_uid)
     res = user_ref.get()
 
     data = {}
+    data['username'] = res.get('username')
     data['first_name'] = res.get('first_name')
     data['last_name'] = res.get('last_name')
     data['photo_url'] = res.get('photo_url')
@@ -100,16 +69,13 @@ def get_see_my_profile():
 def empty_string_to_none(value):
     return None if value == "" else value
 
-def edit_user(first_name, last_name, phone, photo_url):
-    # Verifica si el usuario está autenticado
-    if not AUTH_DB.current_user:
-        return Response({'message': "UNAUTHORIZED_USER"}, status=401)
+def edit_user(firebase_token, first_name, last_name, phone, photo_url):
 
     # Crea una cuenta de usuario en Firebase Authentication
     try:
 
-        # Obten el token del usuario registrado
-        firebase_uid = AUTH_DB.current_user["localId"]
+        decoded_token = auth.verify_id_token(firebase_token)
+        firebase_uid = decoded_token['uid']
 
         user_ref = FIREBASE_DB.collection('users').document(firebase_uid)
 
@@ -124,8 +90,6 @@ def edit_user(first_name, last_name, phone, photo_url):
             'phone': phone,
             'photo_url': photo_url,
         })
-
-        print(last_name)
 
         return Response({'message': "OK"}, status=200)
     except Exception as e:

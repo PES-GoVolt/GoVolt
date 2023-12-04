@@ -12,6 +12,7 @@ class CustomUser(AbstractUser):
     firebase_uid = models.CharField(max_length=128, unique=True, null=True, default=None)
     phone = models.CharField(max_length=30, null=True, default=None)
     email = models.CharField(max_length=30, null=True, default=None)
+    username = models.CharField(max_length=30, null=True, default=None)
 
     # Especifica nombres de acceso inverso personalizados para los campos de grupos y permisos
     groups = models.ManyToManyField('auth.Group', related_name='custom_users')
