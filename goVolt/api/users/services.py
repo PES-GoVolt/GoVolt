@@ -50,6 +50,7 @@ def get_see_my_profile(firebase_token):
     res = user_ref.get()
 
     data = {}
+    data['username'] = res.get('username')
     data['first_name'] = res.get('first_name')
     data['last_name'] = res.get('last_name')
     data['photo_url'] = res.get('photo_url')

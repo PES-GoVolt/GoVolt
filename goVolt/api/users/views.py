@@ -22,8 +22,6 @@ class RegisterApiView(APIView):
     @csrf_exempt
     def post(self, request):
 
-        print("entrooooo")
-
         data = json.loads(request.body)
         firebase_token = request.headers.get("Authorization", "").split(" ")[1]
 

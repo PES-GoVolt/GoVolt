@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import RutaViaje
-from api.rutas.services import store_ruta, get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, \
+from api.routes.services import store_ruta, get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, \
     get_routes_participadas, remove_participant
 import json
 
@@ -11,12 +11,11 @@ from api.users.authentication import FirebaseAuthentication
 
 class AllRoutesView(APIView):
 
-    #permission_classes = [ IsAuthenticated ]
-    #authentication_classes = [ FirebaseAuthentication ]
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
 
     def get(self, request):
-        #firebase_token = request.headers.get("Authorization", "").split(" ")[1]
-        firebase_token = "abc"
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
         return Response({'rutas': get_all_rutas(firebase_token)}, status=status.HTTP_200_OK)
 
     def post(self, request):
