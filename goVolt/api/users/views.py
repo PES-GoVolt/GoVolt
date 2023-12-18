@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from api.users.services import store_user, get_see_my_profile, edit_user
+from api.users.services import store_user, get_see_my_profile, edit_user, has_info_external
 from rest_framework.permissions import IsAuthenticated
 from api.users.authentication import FirebaseAuthentication
 
@@ -106,3 +106,13 @@ class EditMyProfileApiView(APIView):
         else:
             # Si result no es una excepción, es el resultado exitoso
             return Response({'message':'Successful Edit'},status=status.HTTP_200_OK)
+        
+class ExternalUserApiView(APIView):
+
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
+    
+    def get(self, request):
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+
+        return Response(has_info_external(firebase_token), status=status.HTTP_200_OK)

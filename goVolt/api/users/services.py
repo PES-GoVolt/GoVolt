@@ -66,6 +66,26 @@ def get_see_my_profile(firebase_token):
         print(serializer.errors)
         raise ValidationError(serializer.errors)
 
+def has_info_external(firebase_token):
+    decoded_token = auth.verify_id_token(firebase_token)
+    firebase_uid = decoded_token['uid']
+
+    user_ref = FIREBASE_DB.collection('users').document(firebase_uid)
+    res = user_ref.get()
+
+    # Verifica si el documento existe
+    data = res.to_dict()
+
+    if data:
+        data['username'] = data.get('username', None)
+        data['phone'] = data.get('phone', None)
+        data['email'] = data.get('email', None)
+
+    if (data['username'] == None or data['phone'] == None or data['email'] == None ):
+        return False
+    else:
+        return True
+
 def empty_string_to_none(value):
     return None if value == "" else value
 
