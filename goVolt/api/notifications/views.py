@@ -22,7 +22,7 @@ class NotificationsAPIView(APIView):
         return Response({'message':'Notification created'},status=status.HTTP_201_CREATED)
     
     def get(self,request):
-        user_id = request.query_params.get('user_id','')
-        notifications = get_user_notifications(user_id)
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+        notifications = get_user_notifications(firebase_token)
         return Response({'notifications':notifications},status=status.HTTP_200_OK)
     

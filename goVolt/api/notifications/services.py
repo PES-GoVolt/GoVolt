@@ -22,22 +22,27 @@ def save_notification(notification,user_id):
     notification_node.set(notificationdata)
 
 
-def get_user_notifications(user_id):
-    ref = db.reference('/' + user_id)
+def get_user_notifications(firebase_token):
+    decoded_token = auth.verify_id_token(firebase_token)
+    user_id = decoded_token['uid']
+
+    ref = db.reference('notifications/'+user_id+'/')
     notifications_data = ref.get()
+
     notifications = []
     if notifications_data:
-            for notification_id, notification_info in notifications_data.items():
-                if 'content' in notification_info:
-                    notification = {
-                        'content': notification_info['content'],
-                        'timestamp': notification_info['timestamp']
-                    }
-                    notifications.append(notification)
-            notifications = sorted(notifications, key=lambda x: x['timestamp'])
-            serializer = NotificationSerializer(data=notifications,many=True)
-            if serializer.is_valid():
-                return serializer.data
-            else:
-                raise serializers.ValidationError(serializer.errors)
+        for notification_id, notification_info in notifications_data.items():
+            print(notification_info)
+            if 'content' in notification_info:
+                notification = {
+                    'content': notification_info['content'],
+                    'timestamp': notification_info['timestamp']
+                }
+                notifications.append(notification)
+        notifications = sorted(notifications, key=lambda x: x['timestamp'])
+        serializer = NotificationSerializer(data=notifications,many=True)
+        if serializer.is_valid():
+            return serializer.data
+        else:
+            raise serializers.ValidationError(serializer.errors)
     return notifications
