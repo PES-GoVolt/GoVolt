@@ -26,7 +26,11 @@ def store_user(firebase_token, email, phone, username):
             'phone': phone,
             'email': email,
             'username': username,
-            'firebase_uid': firebase_uid
+            'firebase_uid': firebase_uid,
+            'messages_achievement': 0,
+            'nearest_charger_achievement': 0,
+            'search_location_achievement': 0,
+            'search_event_achievement': 0
         }
 
         collection_ref = FIREBASE_DB.collection(collection_name)
@@ -100,3 +104,29 @@ def edit_user(firebase_token, first_name, last_name, phone, photo_url):
         msg = error_data['error']['message']
 
         return Response({'message': msg}, status=code)
+
+
+def increment_achievement(firebase_token,achievement):
+    decoded_token = auth.verify_id_token(firebase_token)
+    logged_uid = decoded_token['uid']
+    collection_name = 'users'
+    user_ref = FIREBASE_DB.collection(collection_name).document(logged_uid)
+    user_ref.update({
+       achievement: firestore.Increment(1)
+    })
+
+def get_achievements(firebase_token):
+    decoded_token = auth.verify_id_token(firebase_token)
+    firebase_uid = decoded_token['uid']
+    
+    user_ref = FIREBASE_DB.collection('users').document(firebase_uid)
+    res = user_ref.get()
+
+    data = {}
+
+    data['messages_achievement'] = res.get('messages_achievement')
+    data['nearest_charger_achievement'] = res.get('nearest_charger_achievement')
+    data['search_location_achievement'] = res.get('search_location_achievement')
+    data['search_event_achievement'] = res.get('search_event_achievement')
+
+    return data
