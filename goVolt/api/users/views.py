@@ -14,9 +14,25 @@ from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from api.users.services import store_user, get_see_my_profile, edit_user
+from api.users.services import store_user, get_see_my_profile, edit_user,increment_achievement,get_achievements
 from rest_framework.permissions import IsAuthenticated
 from api.users.authentication import FirebaseAuthentication
+
+
+
+class AchievementsApiView(APIView):
+    permission_classes = [ IsAuthenticated ]
+    authentication_classes = [ FirebaseAuthentication ]
+
+    def post(self,request):
+        achievement = request.data['achievement']
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+        increment_achievement(firebase_token,achievement)
+        return Response({"message":"Achievement incremented"},status=status.HTTP_200_OK)
+    
+    def get(self,request):
+        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+        return Response(get_achievements(firebase_token),status=status.HTTP_200_OK)
 
 class RegisterApiView(APIView):
     @csrf_exempt
