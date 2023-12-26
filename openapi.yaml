@@ -88,37 +88,6 @@ paths:
       responses:
         '201':
           description: Bike stations database updated
-  /users/login/:
-    post:
-      tags:
-      - Authentication
-      summary: User login
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
-      responses:
-        '200':
-          description: Successful Authentication
-        '400':
-          description: Invalid email or password
-  /users/logout/:
-    post:
-      tags:
-      - Authentication
-      summary: User logout
-      responses:
-        '200':
-          description: Successful logout
-        '401':
-          description: Unauthorized
   /users/register/:
     post:
       tags:
@@ -156,6 +125,37 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           description: Unauthorized
+  /users/external:
+    get:
+      tags:
+      - User Profile
+      summary: Get True if the User exists and has 'username', 'phone' and 'email' or False if not.
+      responses:
+        '200':
+          description: Successful external retrieval
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: True
+                description: Indica si el usuario tiene la información requerida o no.
+        '401':
+          description: Unauthorized
+  /users/achievement/:
+    get:
+      tags:
+      - User Profile
+      summary: Get Achievement
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+      - User Profile
+      summary: POST Achievement
+      responses:
+        '200':
+          description: OK
   /users/edit-my-profile/:
     post:
       tags:
@@ -212,6 +212,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RouteID'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+    delete:
+      tags:
+      - Routes
+      summary: Remove a route
+      parameters:
+        - name: route_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
         '400':
           description: Bad request
         '401':
@@ -355,14 +378,14 @@ paths:
           description: Not found
         '500':
           description: Internal server error
-  /rutas/add_request_participant/{ruta_id}/:
+  /routes/requests:
     post:
       tags:
-      - Rutas
+      - Routes
       summary: Add participant request for a route
       parameters:
-        - name: ruta_id
-          in: path
+        - name: route_id
+          in: query
           required: true
           schema:
             type: string
@@ -379,25 +402,69 @@ paths:
           description: Not found
         '500':
           description: Internal server error
-  /rutas/remove_request_participant/{ruta_id}/{participant_id}/:
-    post:
+    delete:
       tags:
-      - Rutas
+      - Routes
       summary: Remove participant request for a route. You have to be the participant or the creator of the route.
       parameters:
-        - name: ruta_id
-          in: path
+        - name: route_id
+          in: query
           required: true
           schema:
             type: string
         - name: participant_id
-          in: path
+          in: query
           required: true
           schema:
             type: string
       responses:
         '200':
           description: Successful operation
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /notifications:
+    get:
+      tags:
+      - Notifications
+      summary: Get all notifications from user logged.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+    post:
+      tags:
+      - Notifications
+      summary: Create a new notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationCreated'
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Notification created successfully.
         '400':
           description: Bad request
         '401':
@@ -514,6 +581,18 @@ components:
         - precio
         - num_plazas
         - fecha
+    Notification:
+      type: object
+      properties:
+        content:
+          type: string
+          example: Cancelled route
+        timestamp:
+          type: string
+          example: YYYY-MM-DD HH:MM:SS
+      required:
+        - content
+        - timestamp
     RouteCreated:
       type: object
       properties:
@@ -537,6 +616,16 @@ components:
         - precio
         - num_plazas
         - fecha
+    NotificationCreated:
+      type: object
+      properties:
+        user_id:
+          type: string
+        content:
+          type: string
+      required:
+        - user_id
+        - content
     RouteID:
       type: object
       properties:
@@ -578,5 +667,4 @@ components:
         - ubicacion_final
         - precio
         - num_plazas
-        - fecha
         - fecha
