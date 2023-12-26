@@ -10,6 +10,7 @@ import json
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from api.users.models import CustomUser
+from api.notifications.services import save_notification
 
 from google.cloud.firestore_v1.base_query import FieldFilter
 
@@ -228,6 +229,40 @@ def get_routes_participadas(firebase_token):
         print(str(e))
         return []
 
+def remove_route(firebase_token, ruta_id):
+    try:
+        decoded_token = auth.verify_id_token(firebase_token)
+        logged_user = decoded_token['uid']
+
+        ruta_ref = FIREBASE_DB.collection('rutas').document(ruta_id)
+        res = ruta_ref.get()
+
+        creador_ruta = res.get("creador")
+
+        # si el que añade no es el creador ni el participante => error
+        if (logged_user == creador_ruta):
+
+            participantes = res.get("participantes")
+
+            for participante in participantes:
+                content = "CANCELLED ROUTE - DATE: " + res.get("fecha") + "; FROM: " + res.get("ubicacion_inicial") + "; TO: " + res.get("ubicacion_final")
+                save_notification(content, participante)
+                ruta_ref.delete()
+                return Response({'message': "OK"}, status=200)
+            else:
+                return Response({'message': "PARTICIPANT NOT EXIST"}, status=500)
+        else:
+            return Response({'message': "USER UNAUTHORIZED"}, status=401)
+
+    except Exception as e:
+        error_message = e.args[1]
+        error_data = json.loads(error_message)
+
+        code = error_data['error']['code']
+        msg = error_data['error']['message']
+
+        return Response({'message': msg}, status=code)
+    
 def remove_participant(firebase_token, ruta_id, participant_id):
     try:
 

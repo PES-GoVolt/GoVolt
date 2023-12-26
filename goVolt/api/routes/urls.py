@@ -5,6 +5,7 @@ urlpatterns = [
     # gestión general rutas / creación
         # get - obtengo todas las rutsa menos las que he creado y en las que participo
         # post - creo una ruta
+        # delete - elimino una ruta
     path('', AllRoutesView.as_view(), name='all-routes'),
 
     # gestión rutas en las que soy participante

@@ -7,6 +7,7 @@ from .utils import get_timestamp_now
 from .serializers import MessageSerializer,ChatSerializer 
 from rest_framework import serializers
 from google.cloud import firestore
+
 def save_message(message,room_name,sender):
     ref = db.reference("/")
 
@@ -21,9 +22,6 @@ def save_message(message,room_name,sender):
     }
     message_node = ref.child(room_name).push()
     message_node.set(messagedata)
-
-
-
 
 def get_room_messages(room_name):
     ref = db.reference('/' + room_name)
