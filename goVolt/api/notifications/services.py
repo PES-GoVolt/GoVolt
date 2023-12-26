@@ -7,19 +7,26 @@ from .utils import get_timestamp_now
 from .serializers import NotificationSerializer
 from rest_framework import serializers
 from google.cloud import firestore
+from rest_framework.response import Response
 
 def save_notification(notification,user_id):
-    ref = db.reference("/")
+    try:
+        ref = db.reference("/")
 
-    current_datetime = datetime.now()
-    unix_timestamp = int(current_datetime.timestamp() * 1000)
+        current_datetime = datetime.now()
+        unix_timestamp = int(current_datetime.timestamp() * 1000)
 
-    notificationdata = {
-        "content": notification,
-        "timestamp": unix_timestamp
-    }
-    notification_node = ref.child("notifications/"+user_id).push()
-    notification_node.set(notificationdata)
+        notificationdata = {
+            "content": notification,
+            "timestamp": unix_timestamp
+        }
+        notification_node = ref.child("notifications/"+user_id).push()
+        notification_node.set(notificationdata)
+
+        return Response({'message': "Notification created successfully."}, status=201)
+    
+    except Exception as e:
+        return Response({'message': str(e)}, status=400)
 
 
 def get_user_notifications(firebase_token):
