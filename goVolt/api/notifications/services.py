@@ -4,7 +4,7 @@ import warnings
 from firebase_admin import db,auth
 import json
 from .utils import get_timestamp_now
-from .serializers import NotificationSerializer 
+from .serializers import NotificationSerializer
 from rest_framework import serializers
 from google.cloud import firestore
 
