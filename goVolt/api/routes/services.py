@@ -31,7 +31,12 @@ def store_ruta(firebase_token, data):
         if serializer.is_valid():
             collection_ref = FIREBASE_DB.collection('rutas')
             new_ruta = collection_ref.add(serializer.data)
-
+            collection_name = 'users'
+            user_ref = FIREBASE_DB.collection(collection_name).document(creador_id)
+            user_ref.update({
+                "create_routes_achievement": firestore.Increment(1)
+            })
+    
             return Response({'message': new_ruta[1].id}, status=200)
         else:
             raise ValidationError(serializer.errors)
