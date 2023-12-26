@@ -81,10 +81,12 @@ def has_info_external(firebase_token):
         data['phone'] = data.get('phone', None)
         data['email'] = data.get('email', None)
 
-    if (data['username'] == None or data['phone'] == None or data['email'] == None ):
-        return False
+        if (data['username'] == None or data['phone'] == None or data['email'] == None):
+            return False
+        else:
+            return True
     else:
-        return True
+        return False
 
 def empty_string_to_none(value):
     return None if value == "" else value
