@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from api.chargers.services import get_all_chargers,read_data,store_charge_points_fb,get_charger_by_id
+from api.chargers.services import get_all_chargers,read_data,store_charge_points_fb,get_charger_by_id,increment_nearest_charger_achievement
 from api.chargers.utils import nearest_point
 from rest_framework.permissions import IsAuthenticated
 from api.users.authentication import FirebaseAuthentication
@@ -24,6 +24,8 @@ class NearestChargerApiView(APIView):
             longitud = request.data['longitud']
             latitud = request.data['latitud']
             nearest_charger = get_charger_by_id(nearest_point((longitud, latitud)))
+            firebase_token = request.headers.get("Authorization", "").split(" ")[1]
+            increment_nearest_charger_achievement(firebase_token)
             return Response(nearest_charger, status=status.HTTP_200_OK)
         except KeyError:
             return Response({"error": "Missing 'longitud' or 'latitud' in request body."}, status=status.HTTP_400_BAD_REQUEST)
