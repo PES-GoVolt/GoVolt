@@ -16,6 +16,7 @@ static/
 
 # Ignore virtual environment
 myenv2/
+venv/
 
 # Ignore log files
 *.log
