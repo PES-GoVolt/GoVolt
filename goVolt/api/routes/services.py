@@ -243,14 +243,14 @@ def remove_route(firebase_token, ruta_id):
         if (logged_user == creador_ruta):
 
             participantes = res.get("participantes")
-
-            for participante in participantes:
-                content = "CANCELLED ROUTE - DATE: " + res.get("fecha") + "; FROM: " + res.get("ubicacion_inicial") + "; TO: " + res.get("ubicacion_final")
-                save_notification(content, participante)
-                ruta_ref.delete()
-                return Response({'message': "OK"}, status=200)
-            else:
-                return Response({'message': "PARTICIPANT NOT EXIST"}, status=500)
+            if participantes != None:
+                for participante in participantes:
+                    content = "route_cancelled"
+                    save_notification(content, participante)
+                else:
+                    return Response({'message': "PARTICIPANT NOT EXIST"}, status=500)
+            ruta_ref.delete()
+            return Response({'message': "OK"}, status=200)
         else:
             return Response({'message': "USER UNAUTHORIZED"}, status=401)
 
