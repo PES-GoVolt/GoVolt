@@ -8,6 +8,9 @@ from .serializers import MessageSerializer,ChatSerializer
 from rest_framework import serializers
 from google.cloud import firestore
 
+
+
+
 def save_message(message,room_name,sender):
     ref = db.reference("/")
 
@@ -22,6 +25,33 @@ def save_message(message,room_name,sender):
     }
     message_node = ref.child(room_name).push()
     message_node.set(messagedata)
+def get_all_messages():
+    ref = db.reference('/')
+    messages_data = ref.get()
+    messages = []
+    if messages_data:
+        for message_id, message_info in messages_data.items():
+            content = message_info.get('content')
+            room_name = message_info.get('room_name')
+            sender = message_info.get('sender')
+            timestamp = message_info.get('timestamp')
+
+            if content and room_name and sender and timestamp:
+                message = {
+                    'content': content,
+                    'room_name': room_name,
+                    'sender': sender,
+                    'timestamp': timestamp
+                }
+                messages.append(message)
+            messages = sorted(messages, key=lambda x: x['timestamp'])
+            print(messages)
+            serializer = MessageSerializer(data=messages,many=True)
+            if serializer.is_valid():
+                return serializer.data
+            else:
+                raise serializers.ValidationError(serializer.errors)
+    return messages
 
 def get_room_messages(room_name):
     ref = db.reference('/' + room_name)

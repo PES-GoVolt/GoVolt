@@ -36,9 +36,9 @@ def admin_chats_view(request):
 
 def admin_messages_view(request):
 
-    users = get_all_messages()
-
-    return render(request,'adminUsers.html',{'users':users})
+    messages = get_all_messages()
+    print(messages)
+    return render(request,'adminMessages.html',{'messages':messages})
 
 def admin_chargers_and_bikestations_view(request):
 
