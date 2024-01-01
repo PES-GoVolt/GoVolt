@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form id="userForm">
+        <div class="mb-3">
+        <label for="firstNameLabel" class="form-label">First Name</label>
+        <input class="form-control" name="firstName" type="text" placeholder="First Name" aria-label="default input example" value="{{user.first_name}}">
+        </div>
+
+        <div class="mb-3">
+            <label for="lastNameLabel" class="form-label">Last Name</label>
+            <input class="form-control" name="lastName" type="text" placeholder="Last Name" aria-label="default input example" value="{{user.last_name}}">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="editProfile()">Save</button>
+    </form>
+
+    <script>
+        function editProfile() {
+            // Obtener el valor del otro parámetro de la URL
+            var urlParams = new URLSearchParams(window.location.search);
+            var firebase_uid = urlParams.get('uid');
+
+            // Obtener el token CSRF desde la cookie
+            var csrftoken = document.cookie.match(/csrftoken=([^ ;]*)/)[1];
+
+            // Obtener los datos del formulario
+            var formData = new FormData(document.getElementById('userForm'));
+
+            // Realizar una llamada AJAX a la nueva ruta en tu Django views
+            $.ajax({
+                url: '{% url "save_user_data" %}?uid=' + firebase_uid,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {'X-CSRFToken': csrftoken},  // Incluir el token CSRF en el encabezado
+                success: function(data) {
+                    console.log(data);
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+    </script>
+{% endblock %}

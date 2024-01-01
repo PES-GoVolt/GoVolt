@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Firebase uid</th>
+            <th scope="col">Username</th>
+            <th scope="col">Name </th>
+            <th scope="col">Phone</th>
+            <th scope="col">Email</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+          <tr>
+            <td scope="row">{{user.firebase_uid}}</td>
+            <td scope="row">{{user.username}}</td>
+            <td>
+                {% if user.first_name or user.last_name %}
+                    {{ user.first_name }} {{ user.last_name }}
+                {% else %}
+                {% endif %}
+            </td>
+            <td>{{user.phone}}</td>
+            <td>{{user.email}}</td>
+            <td><button type="button" class="btn btn-danger" onclick="blockUser('{{ user.firebase_uid }}')">Block</button></td>
+            <td><button type="button" class="btn btn-primary" onclick="editUser('{{ user.firebase_uid }}')">Edit</button></td>
+          </tr>
+        </tbody>
+            {% endfor %}
+    </table>
+
+    <script>
+        function blockUser(firebaseUid) {
+            window.location.href = '/block/' + firebaseUid;
+        }
+
+        function editUser(firebaseUid) {
+          var currentUrl = window.location.href;
+          var editUrl = currentUrl + '/edit/?uid=' + firebaseUid;
+          window.location.href = editUrl;
+        }
+    </script>
+{% endblock %}

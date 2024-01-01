@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     'api.users',
     'api.chats',
     'api.routes',
-    'api.notifications'
+    'api.notifications',
+    'adminsite'
 ]
 
 MIDDLEWARE = [

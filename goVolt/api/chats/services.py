@@ -117,4 +117,11 @@ def get_chats_user_loged(firebase_token):
 
     return chats
 
-   
+def get_all_chats():
+    chats_ref = FIREBASE_DB.collection('chats')
+    docs = chats_ref.stream()
+    chats = []
+    for doc in docs:
+        chat = doc.to_dict()
+        chats.append(chat)
+    return chats
