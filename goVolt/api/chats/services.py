@@ -4,7 +4,7 @@ import warnings
 from firebase_admin import db,auth
 import json
 from .utils import get_timestamp_now
-from .serializers import MessageSerializer,ChatSerializer 
+from .serializers import MessageSerializer,ChatSerializer
 from rest_framework import serializers
 from google.cloud import firestore
 
@@ -73,21 +73,21 @@ def save_chat(userUid,room_name,uidCreator, firebase_token):
     collection_ref.add({
          "userUid_sender": userUid,
          "userUid_reciever": logged_uid,
-         "room_name" : room_name+"/"+logged_uid,
+         "room_name" : "chats/" +room_name+"/"+logged_uid,
          "last_conection" : get_timestamp_now(),
          "creator": creator,
          "email":res2.get('email')
     })
-    
+
 
     creator = False
     if(logged_uid == uidCreator):
         creator = True
-    
+
     collection_ref.add({
          "userUid_sender": logged_uid,
          "userUid_reciever": userUid,
-         "room_name" : room_name+"/"+logged_uid,
+         "room_name" : "chats/" +room_name+"/"+logged_uid,
          "last_conection" : get_timestamp_now(),
          "creator": creator,
          "email": res.get('email')
@@ -117,4 +117,3 @@ def get_chats_user_loged(firebase_token):
 
     return chats
 
-   
