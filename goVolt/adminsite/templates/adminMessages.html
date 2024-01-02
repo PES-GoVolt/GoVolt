@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Content</th>
+            <th scope="col">Roomname </th>
+            <th scope="col">Sender</th>
+            <th scope="col">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for message in messages %}
+          <tr>
+            <td scope="row">{{message.content}}</td>
+            <td>{{message.room_name}}</td>
+            <td>{{message.sender}}</td>
+            <td>{{message.timestamp}}</td>
+          </tr>
+        </tbody>
+            {% endfor %}
+      </table>
+{% endblock %}
