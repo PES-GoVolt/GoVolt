@@ -13,4 +13,4 @@ class RutaViajeSerializer(serializers.ModelSerializer):
 class RequestParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestParticipant
-        fields = ['user_id', 'ruta_id']
+        fields = ['user_id', 'ruta_id', 'room_name']

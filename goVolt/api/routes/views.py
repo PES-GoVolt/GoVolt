@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import RutaViaje
 from api.routes.services import store_ruta, get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, \
-    get_routes_participadas, remove_participant, add_request_participant, remove_request_participant, remove_route
+    get_routes_participadas, remove_participant, remove_request_participant, remove_route
 import json
 
 from rest_framework.permissions import IsAuthenticated
@@ -225,6 +225,7 @@ class RequestsView(APIView):
     authentication_classes = [ FirebaseAuthentication ]
 
     # usuario pide ser participante
+    '''
     def post(self, request):
 
         firebase_token = request.headers.get("Authorization", "").split(" ")[1]
@@ -257,6 +258,7 @@ class RequestsView(APIView):
         else:
             # Si result no es una excepción, es el resultado exitoso
             return Response({'message':'Successful Edit Request'},status=status.HTTP_200_OK)
+    '''
 
     def delete(self, request):
 
@@ -264,9 +266,10 @@ class RequestsView(APIView):
         data = request.data
         ruta_id = data['route_id']
         participant_id = data['participant_id']
+        room_name = data['room_name']
 
         # Get the route instance
-        result = remove_request_participant(firebase_token, ruta_id, participant_id)
+        result = remove_request_participant(firebase_token, ruta_id, participant_id, room_name)
 
         if (result.status_code != 200):
             # Verificar si result es una excepción

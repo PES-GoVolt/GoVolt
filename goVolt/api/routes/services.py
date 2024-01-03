@@ -4,7 +4,7 @@ from sodapy import Socrata
 from rest_framework import serializers
 from goVolt.settings import AUTH_DB
 from goVolt.settings import FIREBASE_DB
-from firebase_admin import auth, exceptions
+from firebase_admin import auth, exceptions, db
 from .serializers import RutaViajeSerializer
 import json
 from rest_framework.response import Response
@@ -250,6 +250,7 @@ def remove_route(firebase_token, ruta_id):
                 else:
                     return Response({'message': "PARTICIPANT NOT EXIST"}, status=500)
             ruta_ref.delete()
+
             return Response({'message': "OK"}, status=200)
         else:
             return Response({'message': "USER UNAUTHORIZED"}, status=401)
@@ -282,6 +283,7 @@ def remove_participant(firebase_token, ruta_id, participant_id):
 
             if participant_id in participantes:
                 participantes.remove(participant_id)
+
                 ruta_ref.update({"participantes": participantes})
 
                 return Response({'message': "OK"}, status=200)
@@ -299,6 +301,7 @@ def remove_participant(firebase_token, ruta_id, participant_id):
 
         return Response({'message': msg}, status=code)
 
+'''
 def add_request_participant(firebase_token, ruta_id):
     try:
         decoded_token = auth.verify_id_token(firebase_token)
@@ -342,8 +345,9 @@ def add_request_participant(firebase_token, ruta_id):
         msg = error_data['error']['message']
 
         return Response({'message': msg},status=code)
+'''
 
-def remove_request_participant(firebase_token, ruta_id, participant_id):
+def remove_request_participant(firebase_token, ruta_id, participant_id, room_name):
     try:
         decoded_token = auth.verify_id_token(firebase_token)
         logged_user = decoded_token['uid']
@@ -352,19 +356,31 @@ def remove_request_participant(firebase_token, ruta_id, participant_id):
         res = ruta_ref.get().to_dict()
         creador_ruta = res.get("creador")
 
-        if(logged_user == creador_ruta or logged_user == participant_id):
+        query = FIREBASE_DB.collection('requests_participants').where(
+            filter=FieldFilter('user_id', '==', logged_user)).where(filter=FieldFilter('ruta_id', '==', ruta_id))
+        requests = query.get()
 
+        if logged_user == creador_ruta or (requests and creador_ruta == participant_id):
+            if logged_user == creador_ruta:
                 # Realiza la consulta en la colección requests_participants
                 query = FIREBASE_DB.collection('requests_participants').where(filter=FieldFilter('user_id', '==', participant_id)).where(filter=FieldFilter('ruta_id', '==', ruta_id))
                 requests = query.get()
 
-                #Verifica si hay resultados y lo elimina
+            #Verifica si hay resultados y lo elimina
+            if requests:
+                requests[0].reference.delete()
+                ref = db.reference(room_name)
+                ref.delete()
+                query = FIREBASE_DB.collection('chats').where(
+                    filter=FieldFilter('room_name', '==', room_name))
+                requests = query.get()
                 if requests:
-                    requests[0].reference.delete()
-                    return Response({'message': "OK"},status=200)
-                else:
-                    # Ya existen documentos con los valores proporcionados
-                    return Response({'message': "THE REQUEST DOES NOT EXIST"}, status=500)
+                    for request in requests:
+                        request.reference.delete()
+                return Response({'message': "OK"},status=200)
+            else:
+                # Ya existen documentos con los valores proporcionados
+                return Response({'message': "THE REQUEST DOES NOT EXIST"}, status=500)
 
         else:
             return Response({'message': "USER UNAUTHORIZED"}, status=401)

@@ -1,14 +1,17 @@
-from goVolt.settings import FIREBASE_DB,AUTH_DB
-from datetime import datetime
 import warnings
-from firebase_admin import db,auth
-import json
-from .utils import get_timestamp_now
-from .serializers import MessageSerializer,ChatSerializer
-from rest_framework import serializers
-from google.cloud import firestore
+from datetime import datetime
 
-def save_message(message,room_name,sender):
+from firebase_admin import db, auth
+from google.cloud import firestore
+from rest_framework import serializers
+
+from goVolt.settings import FIREBASE_DB
+from .serializers import MessageSerializer
+from .utils import get_timestamp_now
+
+from google.cloud.firestore_v1.base_query import FieldFilter
+
+def save_message(message, room_name, sender):
     ref = db.reference("/")
 
     current_datetime = datetime.now()
@@ -23,26 +26,27 @@ def save_message(message,room_name,sender):
     message_node = ref.child(room_name).push()
     message_node.set(messagedata)
 
+
 def get_room_messages(room_name):
     ref = db.reference('/' + room_name)
     messages_data = ref.get()
     messages = []
     if messages_data:
-            for message_id, message_info in messages_data.items():
-                if 'content' in message_info:
-                    message = {
-                        'content': message_info['content'],
-                        'room_name': message_info['room_name'],
-                        'sender': message_info['sender'],
-                        'timestamp': message_info['timestamp']
-                    }
-                    messages.append(message)
-            messages = sorted(messages, key=lambda x: x['timestamp'])
-            serializer = MessageSerializer(data=messages,many=True)
-            if serializer.is_valid():
-                return serializer.data
-            else:
-                raise serializers.ValidationError(serializer.errors)
+        for message_id, message_info in messages_data.items():
+            if 'content' in message_info:
+                message = {
+                    'content': message_info['content'],
+                    'room_name': message_info['room_name'],
+                    'sender': message_info['sender'],
+                    'timestamp': message_info['timestamp']
+                }
+                messages.append(message)
+        messages = sorted(messages, key=lambda x: x['timestamp'])
+        serializer = MessageSerializer(data=messages, many=True)
+        if serializer.is_valid():
+            return serializer.data
+        else:
+            raise serializers.ValidationError(serializer.errors)
     return messages
 
 
@@ -54,46 +58,71 @@ def modify_timestamp_chat(id_chat):
     chat_ref.update({"last_conection": chat_info["last_conection"]})
 
 
-def save_chat(userUid,room_name,uidCreator, firebase_token):
+def save_chat(userUid, room_name, uidCreator, firebase_token):
     collection_name = 'chats'
     collection_ref = FIREBASE_DB.collection(collection_name)
 
     decoded_token = auth.verify_id_token(firebase_token)
     logged_uid = decoded_token['uid']
 
-    user_ref = FIREBASE_DB.collection('users').document(userUid)
-    res = user_ref.get()
-    creator = False
+    ruta_ref = FIREBASE_DB.collection('rutas').document(room_name)
+    res_routes = ruta_ref.get().to_dict()
 
-    user_ref2 = FIREBASE_DB.collection('users').document(logged_uid)
-    res2 = user_ref2.get()
-    if(userUid == uidCreator):
-        creator = True
+    participantes = res_routes.get("participantes") or []
 
-    collection_ref.add({
-         "userUid_sender": userUid,
-         "userUid_reciever": logged_uid,
-         "room_name" : "chats/" +room_name+"/"+logged_uid,
-         "last_conection" : get_timestamp_now(),
-         "creator": creator,
-         "email":res2.get('email')
-    })
+    if logged_uid not in participantes:
+        if (res_routes.get("num_plazas") > len(participantes)):
+            # Realiza la consulta en la colección requests_participants
+            query = FIREBASE_DB.collection('requests_participants').where(
+                filter=FieldFilter('user_id', '==', logged_uid)).where(filter=FieldFilter('ruta_id', '==', room_name))
+            request = query.get()
+            # Verifica si hay resultados
+            if not request:
+                # No hay resultados, inserta un nuevo documento
+                new_request = {
+                    'user_id': logged_uid,
+                    'ruta_id': room_name,
+                }
+                FIREBASE_DB.collection('requests_participants').add(new_request)
+            else:
+                # Ya existen documentos con los valores proporcionados
+                return "error2"
 
+            user_ref = FIREBASE_DB.collection('users').document(userUid)
+            res = user_ref.get()
+            creator = False
 
-    creator = False
-    if(logged_uid == uidCreator):
-        creator = True
+            user_ref2 = FIREBASE_DB.collection('users').document(logged_uid)
+            res2 = user_ref2.get()
+            if (userUid == uidCreator):
+                creator = True
 
-    collection_ref.add({
-         "userUid_sender": logged_uid,
-         "userUid_reciever": userUid,
-         "room_name" : "chats/" +room_name+"/"+logged_uid,
-         "last_conection" : get_timestamp_now(),
-         "creator": creator,
-         "email": res.get('email')
-    })
+            collection_ref.add({
+                "userUid_sender": userUid,
+                "userUid_reciever": logged_uid,
+                "room_name": "chats/" + room_name + "/" + logged_uid,
+                "last_conection": get_timestamp_now(),
+                "creator": creator,
+                "email": res2.get('email')
+            })
 
-    return room_name+"/"+logged_uid
+            creator = False
+            if (logged_uid == uidCreator):
+                creator = True
+
+            collection_ref.add({
+                "userUid_sender": logged_uid,
+                "userUid_reciever": userUid,
+                "room_name": "chats/" + room_name + "/" + logged_uid,
+                "last_conection": get_timestamp_now(),
+                "creator": creator,
+                "email": res.get('email')
+            })
+
+            return "chats/"+room_name + "/" + logged_uid
+    else:
+        return "error1"
+
 def get_chats_user_loged(firebase_token):
     collection_name = 'chats'
 
@@ -101,7 +130,8 @@ def get_chats_user_loged(firebase_token):
     logged_uid = decoded_token['uid']
     chat_ref = FIREBASE_DB.collection(collection_name)
     warnings.filterwarnings("ignore", category=UserWarning, module="google.cloud.firestore_v1.base_collection")
-    query = chat_ref.where('userUid_sender', '==', logged_uid).order_by('last_conection', direction=firestore.Query.DESCENDING)
+    query = chat_ref.where('userUid_sender', '==', logged_uid).order_by('last_conection',
+                                                                        direction=firestore.Query.DESCENDING)
     docs = query.get()
     chats = []
     for doc in docs:
@@ -116,4 +146,3 @@ def get_chats_user_loged(firebase_token):
         chats.append(data)
 
     return chats
-
