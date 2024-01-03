@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Altitude</th>
+            <th scope="col">Latitude</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for charger in chargers %}
+          <tr>
+            <td scope="row">{{charger.charger_id}}</td>
+            <td>{{charger.latitude}}</td>
+            <td>{{charger.longitude}}</td>
+            <td><button type="button" class="btn btn-danger" onclick="deleteCharger('{{ charger.charger_id }}')">Delete</button></td>
+          </tr>
+        </tbody>
+            {% endfor %}
+    </table>
+
+    <script>
+        function deleteCharger(charger_id) {
+            
+        }
+
+        function editUser(firebaseUid) {
+          var currentUrl = window.location.href;
+          var editUrl = currentUrl + '/edit/?uid=' + firebaseUid;
+          window.location.href = editUrl;
+        }
+    </script>
+{% endblock %}
