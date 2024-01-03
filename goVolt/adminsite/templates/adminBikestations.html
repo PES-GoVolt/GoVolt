@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Altitude</th>
+            <th scope="col">Latitude</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for station in stations %}
+          <tr>
+            <td scope="row">{{station.station_id}}</td>
+            <td>{{station.latitude}}</td>
+            <td>{{station.longitude}}</td>
+            <td><button type="button" class="btn btn-danger" onclick="deleteStation('{{ station.station_id }}')">Delete</button></td>
+          </tr>
+        </tbody>
+            {% endfor %}
+    </table>
+
+    <script>
+        function deleteStation(station_id) {
+            
+        }
+
+    </script>
+{% endblock %}

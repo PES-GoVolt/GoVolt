@@ -4,6 +4,7 @@ from django.shortcuts import render
 from api.users.services import get_all_users,get_user_info_by_uid,edit_user_with_uid
 from api.chats.services import get_all_chats,get_all_messages
 from api.chargers.services import get_all_chargers
+from api.bikestations.services import get_all_bikestations
 from django.http import JsonResponse
 
 
@@ -46,3 +47,10 @@ def admin_chargers_view(request):
     chargers = get_all_chargers()
 
     return render(request,'adminChargers.html',{'chargers':chargers})
+
+
+def admin_bikestations_view(request):
+
+    stations = get_all_bikestations()
+
+    return render(request,'adminBikestations.html',{'stations':stations})

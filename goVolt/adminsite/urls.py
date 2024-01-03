@@ -7,5 +7,6 @@ urlpatterns = [
     path('save_user_data', views.save_user_data, name='save_user_data'),   
     path('messages',views.admin_messages_view,name='admin-messages-view'),
     path('chats',views.admin_chats_view,name='admin-chats-view'),
-    path('chargers',views.admin_chargers_view,name='admin-chats-view')
+    path('chargers',views.admin_chargers_view,name='admin-chargers-view'),
+    path('bikestations',views.admin_bikestations_view,name='admin-bikestations-view')
 ]
