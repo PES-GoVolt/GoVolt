@@ -8,8 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 from api.users.authentication import FirebaseAuthentication
 
 class BikeStationsApiView(APIView):
-    permission_classes = [ IsAuthenticated ]
-    authentication_classes = [ FirebaseAuthentication ]
     def get(self,request):
         return Response(get_all_bikestations(),status=status.HTTP_200_OK)
 
