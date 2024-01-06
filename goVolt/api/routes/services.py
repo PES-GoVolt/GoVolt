@@ -107,7 +107,15 @@ def get_ruta_by_id(firebase_token, id):
     data['fecha'] = res.get('fecha')
     data['creador'] = res.get('creador')
     data['creador_email']= res.get('creador_email')
-    # data['participantes']= res.get('participantes')
+    data['participantes']= res.get('participantes')
+
+    ids_participantes = res.get('participantes', [])
+    nombres_participantes = []
+    for id_participante in ids_participantes:
+        nombre_participante = FIREBASE_DB.collection('users').document(id_participante).get().get('username')
+        nombres_participantes.append(nombre_participante)
+
+    data['nombreParticipantes'] = nombres_participantes
 
     serializer = RutaViajeSerializer(data=data)
     if serializer.is_valid():
@@ -263,7 +271,7 @@ def remove_route(firebase_token, ruta_id):
 
         return Response({'message': msg}, status=code)
     
-def remove_participant(firebase_token, ruta_id, participant_id):
+def remove_participant(firebase_token, ruta_id, participant_id, participant_name):
     try:
 
         decoded_token = auth.verify_id_token(firebase_token)
@@ -279,12 +287,15 @@ def remove_participant(firebase_token, ruta_id, participant_id):
         if (logged_user == creador_ruta or logged_user == participante):
 
             participantes = res.get("participantes")
+            nombreParticipantes = res.get("nombreParticipantes")
 
             if participant_id in participantes:
                 participantes.remove(participant_id)
                 ruta_ref.update({"participantes": participantes})
-
-                return Response({'message': "OK"}, status=200)
+                if participant_name in nombreParticipantes:
+                    nombreParticipantes.remove(participant_name)
+                    ruta_ref.update({"nombreParticipantes": nombreParticipantes})
+                    return Response({'message': "OK"}, status=200)
             else:
                 return Response({'message': "PARTICIPANT NOT EXIST"}, status=500)
         else:
