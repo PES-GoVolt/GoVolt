@@ -21,8 +21,8 @@ def store_ruta(firebase_token, data):
         creador_id = decoded_token['uid']
 
         users_ref = FIREBASE_DB.collection('users')
+        print(creador_id)
         user = users_ref.where('firebase_uid', '==', creador_id).get()[0].to_dict()
-
         data['creador'] = creador_id
         data['participantes'] = None
         data['username'] = user['username']
@@ -89,6 +89,27 @@ def get_all_rutas(firebase_token):
 
     return rutas_encontradas
 
+
+def get_all_routes_admin():
+    routes_ref = FIREBASE_DB.collection('rutas')
+    routes = routes_ref.get()
+
+    # Itera sobre los resultados para obtener los datos de las rutas encontradas
+    routes_data = []
+    for route in routes:
+        data = route.to_dict()
+        data['route_id'] = route.id
+        data['ubicacion_inicial'] = route.get('ubicacion_inicial')
+        data['ubicacion_final'] = route.get('ubicacion_final')
+        data['precio'] = route.get('precio')
+        data['num_plazas'] = route.get('num_plazas')
+        data['fecha'] = route.get('fecha')
+        data['creador'] = route.get('creador')
+        data['participantes'] = route.get('participantes')
+        data['username'] = route.get('username')
+        routes_data.append(data)
+    print(routes)
+    return routes_data
 
 def get_ruta_by_id(firebase_token, id):
     decoded_token = auth.verify_id_token(firebase_token)

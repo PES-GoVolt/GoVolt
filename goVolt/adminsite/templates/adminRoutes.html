@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Ubicacion inicial</th>
+            <th scope="col">Ubicacion final</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Numero Plazas</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Creador</th>
+            <th scope="col">Participantes</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for route in routes %}
+          <tr>
+            <td scope="row">{{route.route_id}}</td>
+            <td>{{route.ubicacion_inicial}}</td>
+            <td>{{route.ubicacion_final}}</td>
+            <td>{{route.precio}}</td>
+            <td>{{route.num_plazas}}</td>
+            <td>{{route.fecha}}</td>
+            <td>{{route.creador}}</td>
+            <td>{{route.participantes}}</td>
+            <td><button type="button" class="btn btn-danger" onclick="deleteCharger('{{ charger.charger_id }}')">Delete</button></td>
+          </tr>
+        </tbody>
+            {% endfor %}
+    </table>
+
+    <script>
+        function deleteCharger(charger_id) {
+            
+        }
+
+        function editUser(firebaseUid) {
+          var currentUrl = window.location.href;
+          var editUrl = currentUrl + '/edit/?uid=' + firebaseUid;
+          window.location.href = editUrl;
+        }
+    </script>
+{% endblock %}
