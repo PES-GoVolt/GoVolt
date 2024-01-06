@@ -25,7 +25,6 @@
     <script>
         function deleteCharger(charger_id) {
           var urlParams = new URLSearchParams(window.location.search);
-            var firebase_uid = urlParams.get('uid');
             var csrftoken = document.cookie.match(/csrftoken=([^ ;]*)/)[1];
 
             $.ajax({

@@ -7,6 +7,9 @@ from .serializers import BikestationLocationSerializer
 URL_API_BIKES = 'https://api.bsmsa.eu/ext/api/bsm/gbfs/v2/en/station_information'
 
 
+def delete_bikestation(id):
+    doc_ref = FIREBASE_DB.collection('bike_stations').document(str(id))
+    doc_ref.delete()
 
 def read_data_stations():
     data = requests.get(URL_API_BIKES)

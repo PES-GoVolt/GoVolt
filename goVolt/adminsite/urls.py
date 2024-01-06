@@ -10,6 +10,6 @@ urlpatterns = [
     path('chargers',views.admin_chargers_view,name='admin-chargers-view'),
     path('bikestations',views.admin_bikestations_view,name='admin-bikestations-view'),
     path('routes',views.admin_routes_view,name='admin-routes-view'),
-    path('delete-charger',views.charger_delete_post,name='delete-charger')
-
+    path('delete-charger',views.charger_delete_post,name='delete-charger'),
+    path('delete-bikestation',views.bikestation_delete_post,name='delete-bikestation')
 ]
