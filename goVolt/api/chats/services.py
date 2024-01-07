@@ -11,6 +11,7 @@ from .utils import get_timestamp_now
 
 from google.cloud.firestore_v1.base_query import FieldFilter
 
+
 def save_message(message, room_name, sender):
     ref = db.reference("/")
 
@@ -25,6 +26,33 @@ def save_message(message, room_name, sender):
     }
     message_node = ref.child(room_name).push()
     message_node.set(messagedata)
+def get_all_messages():
+    ref = db.reference('/')
+    messages_data = ref.get()
+    messages = []
+    if messages_data:
+        for message_id, message_info in messages_data.items():
+            content = message_info.get('content')
+            room_name = message_info.get('room_name')
+            sender = message_info.get('sender')
+            timestamp = message_info.get('timestamp')
+
+            if content and room_name and sender and timestamp:
+                message = {
+                    'content': content,
+                    'room_name': room_name,
+                    'sender': sender,
+                    'timestamp': timestamp
+                }
+                messages.append(message)
+            messages = sorted(messages, key=lambda x: x['timestamp'])
+            print(messages)
+            serializer = MessageSerializer(data=messages,many=True)
+            if serializer.is_valid():
+                return serializer.data
+            else:
+                raise serializers.ValidationError(serializer.errors)
+    return messages
 
 
 def get_room_messages(room_name):
@@ -146,3 +174,13 @@ def get_chats_user_loged(firebase_token):
         chats.append(data)
 
     return chats
+
+def get_all_chats():
+    chats_ref = FIREBASE_DB.collection('chats')
+    docs = chats_ref.stream()
+    chats = []
+    for doc in docs:
+        chat = doc.to_dict()
+        chats.append(chat)
+    return chats
+  

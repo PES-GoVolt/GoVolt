@@ -11,6 +11,7 @@ class RutaViaje(models.Model):
     creador = models.CharField(max_length=128, null=False, blank=False)
     username = models.CharField(max_length=128, null=False, blank=False)
     participantes = ArrayField(models.CharField(max_length=128), blank=True, null=True)
+    nombreParticipantes = ArrayField(models.CharField(max_length=128), blank=True, null=True)
 
     class Meta:
         db_table = 'rutas'

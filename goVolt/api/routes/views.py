@@ -194,9 +194,10 @@ class MyRoutesView(APIView):
         data = request.data
         ruta_id = data['route_id']
         participant_id = data['participant_id']
+        participant_name = data['participant_name']
         
         # Get the route instance
-        result = remove_participant(firebase_token, ruta_id, participant_id)
+        result = remove_participant(firebase_token, ruta_id, participant_id, participant_name)
 
         if (result.status_code != 200):
             # Verificar si result es una excepción

@@ -43,10 +43,16 @@ def store_user(firebase_token, email, phone, username):
 
         return Response({'message': str(e)}, status=400)
 
+def get_all_users():
+    user_ref = FIREBASE_DB.collection('users')
+    docs = user_ref.stream()
+    users = []
+    for doc in docs:
+        user = doc.to_dict()
+        users.append(user)
+    return users
 
 def get_see_my_profile(firebase_token):
-    # Obten el token de autenticación de la solicitud
-
     decoded_token = auth.verify_id_token(firebase_token)
     firebase_uid = decoded_token['uid']
     
@@ -69,6 +75,19 @@ def get_see_my_profile(firebase_token):
     else:
         print(serializer.errors)
         raise ValidationError(serializer.errors)
+
+
+def get_user_info_by_uid(firebase_uid):
+    user_ref = FIREBASE_DB.collection('users').document(firebase_uid)
+    res = user_ref.get()
+    data = {}
+    data['username'] = res.get('username') if 'username' in res.to_dict() else ''
+    data['first_name'] = res.get('first_name') if 'first_name' in res.to_dict() else ''
+    data['last_name'] = res.get('last_name') if 'last_name' in res.to_dict() else ''
+    data['photo_url'] = res.get('photo_url') if 'photo_url' in res.to_dict() else ''
+    data['phone'] = res.get('phone') if 'phone' in res.to_dict() else ''
+    data['email'] = res.get('email') if 'email' in res.to_dict() else ''
+    return data
 
 def has_info_external(firebase_token):
     decoded_token = auth.verify_id_token(firebase_token)
@@ -94,6 +113,17 @@ def has_info_external(firebase_token):
 
 def empty_string_to_none(value):
     return None if value == "" else value
+
+def edit_user_with_uid(firebase_uid,first_name,last_name):
+    user_ref = FIREBASE_DB.collection('users').document(firebase_uid)
+    first_name = empty_string_to_none(first_name)
+    last_name = empty_string_to_none(last_name)
+    
+    user_ref.update({
+        'first_name': first_name,
+        'last_name': last_name
+    })
+    return Response({'message': "OK"}, status=200)
 
 def edit_user(firebase_token, first_name, last_name, phone, photo_url):
 
