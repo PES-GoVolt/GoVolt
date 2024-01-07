@@ -43,6 +43,10 @@ class ChatsAPIView(APIView):
         creator_uid = request.data['creator_uid']
         firebase_token = request.headers.get("Authorization", "").split(" ")[1]
         room_name = save_chat(uid,room_name,creator_uid,firebase_token)
+        if (room_name == "error1"):
+            return Response({'message': 'PARTICIPANT ALREADY EXIST'}, status=status.HTTP_400_BAD_REQUEST)
+        if (room_name == "error2"):
+            return Response({'message': 'THE REQUEST ALREADY EXIST'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'message' : 'Chat created ', "room_name" : room_name},status=status.HTTP_201_CREATED)
 
     def get(self,request):
