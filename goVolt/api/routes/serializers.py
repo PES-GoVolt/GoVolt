@@ -4,10 +4,11 @@ from .models import RutaViaje, RequestParticipant
 class RutaViajeSerializer(serializers.ModelSerializer):
     class Meta:
         model = RutaViaje
-        fields = ['ubicacion_inicial', 'ubicacion_final', 'precio', 'num_plazas', 'fecha', 'creador', 'participantes', 'username']
+        fields = ['ubicacion_inicial', 'ubicacion_final', 'precio', 'num_plazas', 'fecha', 'creador', 'participantes', 'username', 'nombreParticipantes']
         extra_kwargs = {
             'creador': {'required': False},
-            'participantes': {'required': False}
+            'participantes': {'required': False},
+            'nombreParticipantes': {'required': False}
         }
 
 class RequestParticipantSerializer(serializers.ModelSerializer):

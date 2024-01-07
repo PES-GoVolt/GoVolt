@@ -170,14 +170,20 @@ def add_participant(firebase_token, ruta_id, participant_id):
         if (logged_user == creador_ruta):
             # comprobar que num_plazas > count(participantes)
             participantes = res.get("participantes")
-
+            nombreParticipantes = res.get("nombreParticipantes")
             if (participantes == None):
                 participantes = []
+            if (nombreParticipantes == None):
+                nombreParticipantes = []
 
             if participant_id not in participantes:
                 if (res.get("num_plazas") > len(participantes)):
                     participantes.append(participant_id)
                     ruta_ref.update({"participantes": participantes})
+                    nombre_participante = FIREBASE_DB.collection('users').document(participant_id).get().get(
+                        'username')
+                    nombreParticipantes.append(nombre_participante)
+                    ruta_ref.update({"nombreParticipantes": nombreParticipantes})
 
                     query = FIREBASE_DB.collection('requests_participants').where(filter=FieldFilter('user_id', '==', logged_user)).where(filter=FieldFilter('ruta_id', '==', ruta_id))
                     requests = query.get()
@@ -200,9 +206,9 @@ def add_participant(firebase_token, ruta_id, participant_id):
                     return Response({'message': "OK"}, status=200)
 
                 else:
-                    return Response({'message': "TOO MANY PARTICIPANTS"}, status=500)
+                    return Response({'message': "TOO MANY PARTICIPANTS"}, status=400)
             else:
-                return Response({'message': "PARTICIPANT ALREADY EXIST"}, status=500)
+                return Response({'message': "PARTICIPANT ALREADY EXIST"}, status=400)
         else:
             return Response({'message': "USER UNAUTHORIZED"}, status=401)
 
@@ -251,12 +257,12 @@ def remove_route(firebase_token, ruta_id):
         if (logged_user == creador_ruta):
 
             participantes = res.get("participantes")
-            if participantes != None:
+            if participantes != None and participantes != []:
                 for participante in participantes:
                     content = "route_cancelled"
                     save_notification(content, participante)
                 else:
-                    return Response({'message': "PARTICIPANT NOT EXIST"}, status=500)
+                    return Response({'message': "PARTICIPANT NOT EXIST"}, status=400)
             ruta_ref.delete()
             return Response({'message': "OK"}, status=200)
         else:
