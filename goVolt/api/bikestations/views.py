@@ -12,9 +12,7 @@ class BikeStationsApiView(APIView):
         return Response(get_all_bikestations(),status=status.HTTP_200_OK)
 
 class BikeStationsDatabaseApiView(APIView):
-    
-    permission_classes = [ IsAuthenticated ]
-    authentication_classes = [ FirebaseAuthentication ]
+
     def post(self,request):
         bikestations = read_data_stations()
         store_data_stations(bikestations)

@@ -10,5 +10,5 @@ class ChargerLocationSerializer(serializers.ModelSerializer):
 class ChargerFullDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChargerFullData
-        fields = ['charger_id', 'latitude', 'longitude', 'ac_dc', 'acces', 'address', 'province_code', 'mun', 'charger_speed', 'conection_type']
+        fields = ['charger_id', 'latitude', 'longitude', 'ac_dc', 'acces', 'adre_a', 'provincia', 'municipi', 'tipus_connexi']
 
