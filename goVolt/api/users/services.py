@@ -1,14 +1,12 @@
-from firebase_admin import firestore
-import pandas as pd
-from sodapy import Socrata
-from rest_framework import serializers
-from goVolt.settings import AUTH_DB
-from goVolt.settings import FIREBASE_DB
-from firebase_admin import auth, exceptions
-from .serializers import UserSerializer
-from rest_framework.exceptions import ValidationError
 import json
+
+from firebase_admin import auth
+from firebase_admin import firestore
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+
+from goVolt.settings import FIREBASE_DB
+from .serializers import UserSerializer
 
 
 def store_user(firebase_token, email, phone, username):

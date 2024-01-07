@@ -1,13 +1,16 @@
-from goVolt.settings import FIREBASE_DB,AUTH_DB
 from datetime import datetime
-import warnings
 from firebase_admin import db,auth
-import json
-from .utils import get_timestamp_now
 from .serializers import NotificationSerializer
 from rest_framework import serializers
-from google.cloud import firestore
 from rest_framework.response import Response
+from datetime import datetime
+
+from firebase_admin import db, auth
+from rest_framework import serializers
+from rest_framework.response import Response
+
+from .serializers import NotificationSerializer
+
 
 def save_notification(notification,user_id):
     try:

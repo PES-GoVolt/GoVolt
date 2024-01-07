@@ -3,13 +3,12 @@ from datetime import datetime
 
 from firebase_admin import db, auth
 from google.cloud import firestore
+from google.cloud.firestore_v1.base_query import FieldFilter
 from rest_framework import serializers
 
 from goVolt.settings import FIREBASE_DB
 from .serializers import MessageSerializer
 from .utils import get_timestamp_now
-
-from google.cloud.firestore_v1.base_query import FieldFilter
 
 
 def save_message(message, room_name, sender):

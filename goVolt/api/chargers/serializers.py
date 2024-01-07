@@ -1,6 +1,8 @@
 
 from rest_framework import serializers
-from .models import ChargerLocation,ChargerFullData
+
+from .models import ChargerLocation, ChargerFullData
+
 
 class ChargerLocationSerializer(serializers.ModelSerializer):
      class Meta:

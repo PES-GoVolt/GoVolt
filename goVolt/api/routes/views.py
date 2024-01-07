@@ -1,13 +1,14 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .models import RutaViaje
-from api.routes.services import store_ruta, get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, \
-    get_routes_participadas, remove_participant, remove_request_participant, remove_route
 import json
 
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from api.routes.services import store_ruta, get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, \
+    get_routes_participadas, remove_participant, remove_request_participant, remove_route
 from api.users.authentication import FirebaseAuthentication
+
 
 class AllRoutesView(APIView):
 

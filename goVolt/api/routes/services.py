@@ -1,18 +1,16 @@
-from firebase_admin import firestore
-import pandas as pd
-from sodapy import Socrata
-from rest_framework import serializers
-from goVolt.settings import AUTH_DB
-from goVolt.settings import FIREBASE_DB
-from firebase_admin import auth, exceptions, db
-from .serializers import RutaViajeSerializer
 import json
-from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
-from api.users.models import CustomUser
-from api.notifications.services import save_notification
 
+from firebase_admin import auth, db
+from firebase_admin import firestore
 from google.cloud.firestore_v1.base_query import FieldFilter
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+
+from api.notifications.services import save_notification
+from goVolt.settings import FIREBASE_DB
+from .serializers import RutaViajeSerializer
+
 
 def store_ruta(firebase_token, data):
     try:

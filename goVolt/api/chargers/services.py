@@ -1,10 +1,11 @@
-from firebase_admin import firestore
 import pandas as pd
-from sodapy import Socrata
-from goVolt.settings import FIREBASE_DB
-from .serializers import ChargerLocationSerializer, ChargerFullDataSerializer
-from rest_framework import serializers
 from firebase_admin import auth
+from firebase_admin import firestore
+from rest_framework import serializers
+from sodapy import Socrata
+
+from goVolt.settings import FIREBASE_DB
+from .serializers import ChargerFullDataSerializer
 
 
 def get_all_chargers():

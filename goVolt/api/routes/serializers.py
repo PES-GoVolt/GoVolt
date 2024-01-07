@@ -1,5 +1,7 @@
 from rest_framework import serializers
+
 from .models import RutaViaje, RequestParticipant
+
 
 class RutaViajeSerializer(serializers.ModelSerializer):
     class Meta:

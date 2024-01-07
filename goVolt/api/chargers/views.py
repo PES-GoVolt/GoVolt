@@ -1,11 +1,11 @@
-from django.shortcuts import render
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
-from api.chargers.services import get_all_chargers,read_data,store_charge_points_fb,get_charger_by_id,increment_nearest_charger_achievement
-from api.chargers.utils import nearest_point
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from api.chargers.services import get_all_chargers, read_data, store_charge_points_fb, get_charger_by_id, \
+    increment_nearest_charger_achievement
+from api.chargers.utils import nearest_point
 from api.users.authentication import FirebaseAuthentication
 
 

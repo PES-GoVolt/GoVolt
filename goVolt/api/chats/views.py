@@ -1,12 +1,11 @@
-from django.shortcuts import render
 from rest_framework import status
-from rest_framework.views import APIView
-from .serializers import MessageSerializer
-from .services import save_message,get_room_messages,modify_timestamp_chat,save_chat,get_chats_user_loged
-from rest_framework.response import Response
-
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from api.users.authentication import FirebaseAuthentication
+from .services import save_message, get_room_messages, modify_timestamp_chat, save_chat, get_chats_user_loged
+
 
 class MessagesAPIView(APIView):
 
@@ -24,9 +23,8 @@ class MessagesAPIView(APIView):
         room = request.query_params.get('room_name','')
         messages = get_room_messages(room)
         return Response({'messages':messages},status=status.HTTP_200_OK)
-    
 
-from firebase_admin import auth
+
 class ChatsAPIView(APIView):
 
     permission_classes = [ IsAuthenticated ]
