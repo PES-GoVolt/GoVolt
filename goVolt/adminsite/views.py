@@ -17,8 +17,6 @@ def admin_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(username)
-        print(password)
         user = authenticate(username=username, password=password)
 
         if user is not None and user.is_superuser:
@@ -125,7 +123,6 @@ def admin_messages_view(request):
     if request.user.is_authenticated:
         if request.user.is_superuser:
             messages = get_all_messages()
-            print(messages)
             return render(request, 'adminMessages.html', {'messages': messages})
         else:
             return redirect('admin-login')
