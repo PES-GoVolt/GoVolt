@@ -14,6 +14,10 @@ from api.notifications.services import save_notification
 
 from google.cloud.firestore_v1.base_query import FieldFilter
 
+def delete_route(route_id):
+    doc_ref = FIREBASE_DB.collection('rutas').document(str(route_id))
+    doc_ref.delete()
+
 def store_ruta(firebase_token, data):
     try:
 

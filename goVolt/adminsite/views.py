@@ -9,6 +9,7 @@ from api.routes.services import get_all_routes_admin
 from django.http import JsonResponse
 from api.chargers.services import delete_charger
 from api.bikestations.services import delete_bikestation
+from api.routes.services import delete_route
 def save_user_data(request):
     if request.method == 'POST':
         first_name = request.POST.get('firstName')
@@ -17,7 +18,12 @@ def save_user_data(request):
         edit_user_with_uid(uid,first_name,last_name)
     response_data = {'status': 'success', 'message': 'Data Saved.'}
     return JsonResponse(response_data)
-
+def route_delete_post(request):
+    if request.method == 'POST':
+        id = request.GET.get('route_id')
+        delete_route(id)
+    response_data = {'status': 'success', 'message': 'Route deleted.'}
+    return JsonResponse(response_data)    
 def charger_delete_post(request):
     if request.method == 'POST':
         id = request.GET.get('charger_id')

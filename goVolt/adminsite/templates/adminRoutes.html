@@ -25,21 +25,29 @@
             <td>{{route.fecha}}</td>
             <td>{{route.creador}}</td>
             <td>{{route.participantes}}</td>
-            <td><button type="button" class="btn btn-danger" onclick="deleteCharger('{{ charger.charger_id }}')">Delete</button></td>
+            <td><button type="button" class="btn btn-danger" onclick="deleteRoute('{{route.route_id}}')">Delete</button></td>
           </tr>
         </tbody>
             {% endfor %}
     </table>
 
     <script>
-        function deleteCharger(charger_id) {
-            
-        }
+        function deleteRoute(route_id) {
+          var urlParams = new URLSearchParams(window.location.search);
+          var csrftoken = document.cookie.match(/csrftoken=([^ ;]*)/)[1];
 
-        function editUser(firebaseUid) {
-          var currentUrl = window.location.href;
-          var editUrl = currentUrl + '/edit/?uid=' + firebaseUid;
-          window.location.href = editUrl;
+          $.ajax({
+              url: '{% url "delete-route" %}?route_id=' + route_id,
+              type: 'POST',
+              contentType: false,
+              headers: {'X-CSRFToken': csrftoken}, 
+              success: function(data) {
+                  window.location.reload();
+              },
+              error: function(error) {
+                  console.error('Error:', error);
+              }
+          });
         }
     </script>
 {% endblock %}
