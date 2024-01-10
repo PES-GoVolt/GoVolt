@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 
 from api.users.services import get_all_users,get_user_info_by_uid,edit_user_with_uid
-from api.chats.services import get_all_chats,get_all_messages
+from api.chats.services import get_all_chats
 from api.chargers.services import get_all_chargers
 from api.bikestations.services import get_all_bikestations
 from api.routes.services import get_all_routes_admin
@@ -113,17 +113,6 @@ def admin_routes_view(request):
         if request.user.is_superuser:
             routes = get_all_routes_admin()
             return render(request, 'adminRoutes.html', {'routes': routes})
-        else:
-            return redirect('admin-login')
-    else:
-        return redirect('admin-login')
-
-def admin_messages_view(request):
-
-    if request.user.is_authenticated:
-        if request.user.is_superuser:
-            messages = get_all_messages()
-            return render(request, 'adminMessages.html', {'messages': messages})
         else:
             return redirect('admin-login')
     else:
