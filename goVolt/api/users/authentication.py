@@ -1,20 +1,8 @@
-from rest_framework.authentication import BaseAuthentication
-from api.users.exceptions import NoAuthToken,InvalidAuthToken,FirebaseError
 from django.contrib.auth.models import User
-import firebase_admin
-from firebase_admin import credentials, auth
-from django.conf import settings
-
-from firebase_admin import firestore
-from rest_framework import serializers
-from goVolt.settings import AUTH_DB
-from goVolt.settings import FIREBASE_DB
 from firebase_admin import auth
-from .serializers import UserSerializer
-from rest_framework.exceptions import ValidationError
-import json
-from rest_framework.response import Response
+from rest_framework.authentication import BaseAuthentication
 
+from api.users.exceptions import NoAuthToken, InvalidAuthToken, FirebaseError
 
 
 class FirebaseAuthentication(BaseAuthentication):

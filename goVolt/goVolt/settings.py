@@ -1,5 +1,7 @@
 from pathlib import Path
+
 from database.firebaseConfig import firebaseConfig
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -76,7 +78,7 @@ DATABASES = {
 
 import firebase_admin
 from firebase_admin import credentials
-from firebase_admin import firestore,db
+from firebase_admin import firestore
 import pyrebase
 
 cred = credentials.Certificate("database/goVoltDB.json")

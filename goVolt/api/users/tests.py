@@ -1,10 +1,12 @@
-from django.test import TestCase
-from rest_framework import status
-from rest_framework.test import APIClient
-from django.urls import reverse
 import json
 from unittest.mock import patch
+
+from django.test import TestCase
+from django.urls import reverse
+from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.test import APIClient
+
 
 class RegisterApiViewTest(TestCase):
     def setUp(self):

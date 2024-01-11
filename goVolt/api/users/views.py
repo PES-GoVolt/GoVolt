@@ -1,23 +1,14 @@
-from django.shortcuts import render
-
-from django.contrib import messages
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 import json
-from rest_framework.views import APIView
-from firebase_admin import auth
-from firebase_admin.auth import ExpiredIdTokenError
-from rest_framework import authentication
-from django.contrib.auth.models import User
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.authtoken.models import Token
-from api.users.services import store_user, get_see_my_profile, edit_user,increment_achievement,get_achievements, has_info_external
-from rest_framework.permissions import IsAuthenticated
-from api.users.authentication import FirebaseAuthentication
 
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from api.users.authentication import FirebaseAuthentication
+from api.users.services import store_user, get_see_my_profile, edit_user, increment_achievement, get_achievements, \
+    has_info_external
 
 
 class AchievementsApiView(APIView):
