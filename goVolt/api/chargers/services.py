@@ -50,11 +50,11 @@ def get_charger_by_id(id):
     data['longitude'] = res.get('longitud')
     data['ac_dc'] = res.get('ac_dc')
     data['acces'] = res.get('acces')
-    data['address'] = res.get('adre_a')
-    data['province_code'] = res.get('codiprov')
-    data['mun'] = res.get('municipi')
+    data['adre_a'] = res.get('adre_a')
+    data['provincia'] = res.get('codiprov')
+    data['municipi'] = res.get('municipi')
     data['charger_speed'] = res.get('tipus_velocitat')
-    data['conection_type'] = res.get('tipus_connexi')
+    data['tipus_connexi'] = res.get('tipus_connexi')
 
     serializer = ChargerFullDataSerializer(data=data, many=False)
     if serializer.is_valid():

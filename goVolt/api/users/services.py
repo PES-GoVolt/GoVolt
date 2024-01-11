@@ -64,6 +64,7 @@ def get_see_my_profile(firebase_token):
     data['photo_url'] = res.get('photo_url')
     data['phone'] = res.get('phone')
     data['email'] = res.get('email')
+    data['id'] = firebase_uid
 
     serializer = UserSerializer(data=data)
 

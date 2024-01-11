@@ -13,6 +13,7 @@ class CustomUser(AbstractUser):
     phone = models.CharField(max_length=30, null=True, default=None)
     email = models.CharField(max_length=30, null=True, default=None)
     username = models.CharField(max_length=30, null=True, default=None)
+    id = models.CharField(max_length=30, primary_key=True)
 
     # Especifica nombres de acceso inverso personalizados para los campos de grupos y permisos
     groups = models.ManyToManyField('auth.Group', related_name='custom_users')
