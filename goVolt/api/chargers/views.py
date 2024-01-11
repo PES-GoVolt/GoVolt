@@ -40,7 +40,7 @@ class ChargerApiView(APIView):
             return Response(charger, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Charger not found"}, status=status.HTTP_404_NOT_FOUND)
-    
+
 class ChargerDataBaseApiView(APIView):
 
     permission_classes = [ IsAuthenticated ]

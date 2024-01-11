@@ -5,8 +5,11 @@ from rest_framework import serializers
 from sodapy import Socrata
 
 from goVolt.settings import FIREBASE_DB
+from .serializers import ChargerLocationSerializer,ChargerFullDataSerializer
+from rest_framework import serializers
+from firebase_admin import auth
+from rest_framework.response import Response
 from .serializers import ChargerFullDataSerializer
-
 
 def get_all_chargers():
     collection_ref = FIREBASE_DB.collection('charge_points')
@@ -37,6 +40,11 @@ def increment_nearest_charger_achievement(firebase_token):
     user_ref.update({
         "nearest_charger_achievement": firestore.Increment(1)
     })
+
+def delete_charger(id):
+    doc_ref = FIREBASE_DB.collection('charge_points').document(str(id))
+    doc_ref.delete()
+
 
 
 def get_charger_by_id(id):
