@@ -15,7 +15,8 @@ media/
 static/
 
 # Ignore virtual environment
-venv/
+myenv2/
+venv
 
 # Ignore log files
 *.log

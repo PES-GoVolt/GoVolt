@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form id="userForm" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+        <label class="form-label">First Name</label>
+        <input class="form-control" name="firstName" type="text" placeholder="First Name" aria-label="default input example" value="{{user.first_name}}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Last Name</label>
+            <input class="form-control" name="lastName" type="text" placeholder="Last Name" aria-label="default input example" value="{{user.last_name}}">
+        </div>
+        <button type="submit" class="btn btn-primary" onclick="editProfile()">Save</button>
+    </form>
+
+    <script>
+        function editProfile() {
+            console.log("Test")
+            var urlParams = new URLSearchParams(window.location.search);
+            var firebase_uid = urlParams.get('uid');
+            var csrftoken = document.cookie.match(/csrftoken=([^ ;]*)/)[1];
+
+            var formData = new FormData(document.getElementById('userForm'));
+
+            $.ajax({
+                url: '{% url "save_user_data" %}?uid=' + firebase_uid,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {'X-CSRFToken': csrftoken}, 
+                success: function(data) {
+                    console.log(data);
+                    var currentUrl = window.location.href;
+                    var trimmedUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
+                    var trimmedUrl = currentUrl.substring(0, trimmedUrl.lastIndexOf('/'));
+                    window.location.href = trimmedUrl;
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+    </script>
+{% endblock %}

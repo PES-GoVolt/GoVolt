@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Altitude</th>
+            <th scope="col">Latitude</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for station in stations %}
+          <tr>
+            <td scope="row">{{station.station_id}}</td>
+            <td>{{station.latitude}}</td>
+            <td>{{station.longitude}}</td>
+            <td><button type="button" class="btn btn-danger" onclick="deleteStation('{{ station.station_id }}')">Delete</button></td>
+          </tr>
+        </tbody>
+            {% endfor %}
+    </table>
+
+    <script>
+        function deleteStation(station_id) {
+          var urlParams = new URLSearchParams(window.location.search);
+            var csrftoken = document.cookie.match(/csrftoken=([^ ;]*)/)[1];
+
+            $.ajax({
+                url: '{% url "delete-bikestation" %}?station_id=' + station_id,
+                type: 'POST',
+                contentType: false,
+                headers: {'X-CSRFToken': csrftoken}, 
+                success: function(data) {
+                    window.location.reload();
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
