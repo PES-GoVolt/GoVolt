@@ -1,13 +1,11 @@
-from django.shortcuts import render
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import NotificationSerializer
-from .services import save_notification,get_user_notifications
-from rest_framework.response import Response
 
-from rest_framework.permissions import IsAuthenticated
 from api.users.authentication import FirebaseAuthentication
+from .services import save_notification, get_user_notifications
+
 
 class NotificationsAPIView(APIView):
 

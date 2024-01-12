@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import RegisterApiView, SeeMyProfileApiView, EditMyProfileApiView,AchievementsApiView, ExternalUserApiView
+
+from .views import RegisterApiView, SeeMyProfileApiView, EditMyProfileApiView, AchievementsApiView, ExternalUserApiView
 
 urlpatterns = [
     path('achievement/',AchievementsApiView.as_view(),name='achievements'),

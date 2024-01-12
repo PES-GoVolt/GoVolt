@@ -1,7 +1,8 @@
-import requests
 import json
+
+import requests
+
 from goVolt.settings import FIREBASE_DB
-from firebase_admin import firestore
 from .serializers import BikestationLocationSerializer
 
 URL_API_BIKES = 'https://api.bsmsa.eu/ext/api/bsm/gbfs/v2/en/station_information'

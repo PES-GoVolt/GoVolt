@@ -1,18 +1,16 @@
-from firebase_admin import firestore
-import pandas as pd
-from sodapy import Socrata
-from rest_framework import serializers
-from goVolt.settings import AUTH_DB
-from goVolt.settings import FIREBASE_DB
-from firebase_admin import auth, exceptions
-from .serializers import RutaViajeSerializer
 import json
-from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
-from api.users.models import CustomUser
-from api.notifications.services import save_notification
 
+from firebase_admin import auth, db
+from firebase_admin import firestore
 from google.cloud.firestore_v1.base_query import FieldFilter
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+
+from api.notifications.services import save_notification
+from goVolt.settings import FIREBASE_DB
+from .serializers import RutaViajeSerializer
+
 
 def delete_route(route_id):
     doc_ref = FIREBASE_DB.collection('rutas').document(str(route_id))
@@ -132,7 +130,15 @@ def get_ruta_by_id(firebase_token, id):
     data['fecha'] = res.get('fecha')
     data['creador'] = res.get('creador')
     data['creador_email']= res.get('creador_email')
-    # data['participantes']= res.get('participantes')
+    data['participantes']= res.get('participantes')
+
+    ids_participantes = res.get('participantes', [])
+    nombres_participantes = []
+    for id_participante in ids_participantes:
+        nombre_participante = FIREBASE_DB.collection('users').document(id_participante).get().get('username')
+        nombres_participantes.append(nombre_participante)
+
+    data['nombreParticipantes'] = nombres_participantes
 
     serializer = RutaViajeSerializer(data=data)
     if serializer.is_valid():
@@ -187,14 +193,20 @@ def add_participant(firebase_token, ruta_id, participant_id):
         if (logged_user == creador_ruta):
             # comprobar que num_plazas > count(participantes)
             participantes = res.get("participantes")
-
+            nombreParticipantes = res.get("nombreParticipantes")
             if (participantes == None):
                 participantes = []
+            if (nombreParticipantes == None):
+                nombreParticipantes = []
 
             if participant_id not in participantes:
                 if (res.get("num_plazas") > len(participantes)):
                     participantes.append(participant_id)
                     ruta_ref.update({"participantes": participantes})
+                    nombre_participante = FIREBASE_DB.collection('users').document(participant_id).get().get(
+                        'username')
+                    nombreParticipantes.append(nombre_participante)
+                    ruta_ref.update({"nombreParticipantes": nombreParticipantes})
 
                     query = FIREBASE_DB.collection('requests_participants').where(filter=FieldFilter('user_id', '==', logged_user)).where(filter=FieldFilter('ruta_id', '==', ruta_id))
                     requests = query.get()
@@ -217,9 +229,9 @@ def add_participant(firebase_token, ruta_id, participant_id):
                     return Response({'message': "OK"}, status=200)
 
                 else:
-                    return Response({'message': "TOO MANY PARTICIPANTS"}, status=500)
+                    return Response({'message': "TOO MANY PARTICIPANTS"}, status=400)
             else:
-                return Response({'message': "PARTICIPANT ALREADY EXIST"}, status=500)
+                return Response({'message': "PARTICIPANT ALREADY EXIST"}, status=400)
         else:
             return Response({'message': "USER UNAUTHORIZED"}, status=401)
 
@@ -268,13 +280,14 @@ def remove_route(firebase_token, ruta_id):
         if (logged_user == creador_ruta):
 
             participantes = res.get("participantes")
-            if participantes != None:
+            if participantes != None and participantes != []:
                 for participante in participantes:
-                    content = "route_cancelled"
+                    content = res.get("fecha") + "; " + res.get("ubicacion_inicial") + "; ->: " + res.get("ubicacion_final")
                     save_notification(content, participante)
                 else:
-                    return Response({'message': "PARTICIPANT NOT EXIST"}, status=500)
+                    return Response({'message': "PARTICIPANT NOT EXIST"}, status=400)
             ruta_ref.delete()
+
             return Response({'message': "OK"}, status=200)
         else:
             return Response({'message': "USER UNAUTHORIZED"}, status=401)
@@ -288,7 +301,7 @@ def remove_route(firebase_token, ruta_id):
 
         return Response({'message': msg}, status=code)
     
-def remove_participant(firebase_token, ruta_id, participant_id):
+def remove_participant(firebase_token, ruta_id, participant_id, participant_name):
     try:
 
         decoded_token = auth.verify_id_token(firebase_token)
@@ -304,12 +317,16 @@ def remove_participant(firebase_token, ruta_id, participant_id):
         if (logged_user == creador_ruta or logged_user == participante):
 
             participantes = res.get("participantes")
+            nombreParticipantes = res.get("nombreParticipantes")
 
             if participant_id in participantes:
                 participantes.remove(participant_id)
-                ruta_ref.update({"participantes": participantes})
 
-                return Response({'message': "OK"}, status=200)
+                ruta_ref.update({"participantes": participantes})
+                if participant_name in nombreParticipantes:
+                    nombreParticipantes.remove(participant_name)
+                    ruta_ref.update({"nombreParticipantes": nombreParticipantes})
+                    return Response({'message': "OK"}, status=200)
             else:
                 return Response({'message': "PARTICIPANT NOT EXIST"}, status=500)
         else:
@@ -324,6 +341,7 @@ def remove_participant(firebase_token, ruta_id, participant_id):
 
         return Response({'message': msg}, status=code)
 
+'''
 def add_request_participant(firebase_token, ruta_id):
     try:
         decoded_token = auth.verify_id_token(firebase_token)
@@ -367,8 +385,9 @@ def add_request_participant(firebase_token, ruta_id):
         msg = error_data['error']['message']
 
         return Response({'message': msg},status=code)
+'''
 
-def remove_request_participant(firebase_token, ruta_id, participant_id):
+def remove_request_participant(firebase_token, ruta_id, participant_id, room_name):
     try:
         decoded_token = auth.verify_id_token(firebase_token)
         logged_user = decoded_token['uid']
@@ -377,19 +396,31 @@ def remove_request_participant(firebase_token, ruta_id, participant_id):
         res = ruta_ref.get().to_dict()
         creador_ruta = res.get("creador")
 
-        if(logged_user == creador_ruta or logged_user == participant_id):
+        query = FIREBASE_DB.collection('requests_participants').where(
+            filter=FieldFilter('user_id', '==', logged_user)).where(filter=FieldFilter('ruta_id', '==', ruta_id))
+        requests = query.get()
 
+        if logged_user == creador_ruta or (requests and creador_ruta == participant_id):
+            if logged_user == creador_ruta:
                 # Realiza la consulta en la colección requests_participants
                 query = FIREBASE_DB.collection('requests_participants').where(filter=FieldFilter('user_id', '==', participant_id)).where(filter=FieldFilter('ruta_id', '==', ruta_id))
                 requests = query.get()
 
-                #Verifica si hay resultados y lo elimina
+            #Verifica si hay resultados y lo elimina
+            if requests:
+                requests[0].reference.delete()
+                ref = db.reference(room_name)
+                ref.delete()
+                query = FIREBASE_DB.collection('chats').where(
+                    filter=FieldFilter('room_name', '==', room_name))
+                requests = query.get()
                 if requests:
-                    requests[0].reference.delete()
-                    return Response({'message': "OK"},status=200)
-                else:
-                    # Ya existen documentos con los valores proporcionados
-                    return Response({'message': "THE REQUEST DOES NOT EXIST"}, status=500)
+                    for request in requests:
+                        request.reference.delete()
+                return Response({'message': "OK"},status=200)
+            else:
+                # Ya existen documentos con los valores proporcionados
+                return Response({'message': "THE REQUEST DOES NOT EXIST"}, status=500)
 
         else:
             return Response({'message': "USER UNAUTHORIZED"}, status=401)

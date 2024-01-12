@@ -15,9 +15,8 @@ class ChargerFullData(models.Model):
     longitude = models.FloatField(null=True,blank=False)
     ac_dc = models.CharField(max_length=100)
     acces = models.CharField(max_length=100)
-    address = models.CharField(max_length=200)
-    province_code = models.CharField(max_length=100)
-    mun = models.CharField(max_length=100)
-    charger_speed = models.CharField(max_length=100)
-    conection_type = models.CharField(max_length=200)
+    adre_a = models.CharField(max_length=200)
+    provincia = models.CharField(max_length=100)
+    municipi = models.CharField(max_length=100)
+    tipus_connexi = models.CharField(max_length=100)
 

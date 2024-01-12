@@ -1,13 +1,14 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .models import RutaViaje
-from api.routes.services import store_ruta, get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, \
-    get_routes_participadas, remove_participant, add_request_participant, remove_request_participant, remove_route
 import json
 
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from api.routes.services import store_ruta, get_mis_rutas, get_all_rutas, get_ruta_by_id, edit_ruta, add_participant, \
+    get_routes_participadas, remove_participant, remove_request_participant, remove_route
 from api.users.authentication import FirebaseAuthentication
+
 
 class AllRoutesView(APIView):
 
@@ -194,9 +195,10 @@ class MyRoutesView(APIView):
         data = request.data
         ruta_id = data['route_id']
         participant_id = data['participant_id']
+        participant_name = data['participant_name']
         
         # Get the route instance
-        result = remove_participant(firebase_token, ruta_id, participant_id)
+        result = remove_participant(firebase_token, ruta_id, participant_id, participant_name)
 
         if (result.status_code != 200):
             # Verificar si result es una excepción
@@ -224,49 +226,16 @@ class RequestsView(APIView):
     permission_classes = [ IsAuthenticated ]
     authentication_classes = [ FirebaseAuthentication ]
 
-    # usuario pide ser participante
-    def post(self, request):
-
-        firebase_token = request.headers.get("Authorization", "").split(" ")[1]
-        
-        data = request.data
-        ruta_id = data['route_id']
-
-        # Get the route instance
-        result = add_request_participant(firebase_token, ruta_id)
-
-        if (result.status_code != 200):
-            # Verificar si result es una excepción
-            code = result.status_code
-
-            if code == 200:
-                st = status.HTTP_200_OK
-            elif code == 400:
-                st = status.HTTP_400_BAD_REQUEST
-            elif code == 401:
-                st = status.HTTP_401_UNAUTHORIZED
-            elif code == 403:
-                st = status.HTTP_403_FORBIDDEN
-            elif code == 404:
-                st = status.HTTP_404_NOT_FOUND
-            elif code == 500:
-                st = status.HTTP_500_INTERNAL_SERVER_ERROR
-
-            return Response({"message": result.data.get('message')}, status=st)
-
-        else:
-            # Si result no es una excepción, es el resultado exitoso
-            return Response({'message':'Successful Edit Request'},status=status.HTTP_200_OK)
-
     def delete(self, request):
 
         firebase_token = request.headers.get("Authorization", "").split(" ")[1]
         data = request.data
         ruta_id = data['route_id']
         participant_id = data['participant_id']
+        room_name = data['room_name']
 
         # Get the route instance
-        result = remove_request_participant(firebase_token, ruta_id, participant_id)
+        result = remove_request_participant(firebase_token, ruta_id, participant_id, room_name)
 
         if (result.status_code != 200):
             # Verificar si result es una excepción

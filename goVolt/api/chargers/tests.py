@@ -1,8 +1,8 @@
 from django.test import TestCase
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from django.urls import reverse
-import json
+
 
 class ChargerLocationApiViewTest(TestCase):
     def test_charger_location_view(self):

@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import ChargerLocationApiView,ChargerDataBaseApiView,ChargerApiView,NearestChargerApiView
+
+from .views import ChargerLocationApiView, ChargerDataBaseApiView, ChargerApiView, NearestChargerApiView
 
 urlpatterns = [
     path('all',ChargerLocationApiView.as_view(),name='chargers-loc'),
